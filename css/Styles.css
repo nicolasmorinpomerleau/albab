@@ -1,0 +1,2937 @@
+/* ═══════════════════════════════════════════════════════════════════
+   QURAN DISPLAY v8 · Three-theme stylesheet
+   Themes: manuscript | minimal | scholar
+   ═══════════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Cinzel:wght@400;600&family=Raleway:wght@300;400;600&family=Lato:wght@300;400&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap');
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 16px; }
+
+/* ════════════════════════════════════════════════════════════════════
+   THEME TOKENS
+   ════════════════════════════════════════════════════════════════════ */
+[data-theme="manuscript"] {
+    --bg-page:         #0f0b05;
+    --bg-sidebar:      #0f0b05;
+    --bg-content:      #1a1208;
+    --bg-toc:          #0f0b05;
+    --bg-toc-active:   #c9a44415;
+    --bg-input:        #c9a44410;
+    --bg-btn:          transparent;
+    --bg-btn-hover:    #c9a44418;
+    --bg-results:      #100d06;
+    --bg-header:       #0f0b05;
+    --bg-footer:       #0f0b05;
+    --accent:          #c9a444;
+    --accent-dim:      #c9a44480;
+    --accent-faint:    #c9a44428;
+    --accent-trace:    #c9a44412;
+    --text-primary:    #f5ecce;
+    --text-secondary:  #dcc070;
+    --text-muted:      #c9a444cc;
+    --text-btn:        #c9a444;
+    --text-toc:        #c9a444bb;
+    --text-toc-active: #e8c85a;
+    --text-verse:      #f2e4b8;
+    --text-hijri:      #dcc070;
+    --text-result:     #c9a444cc;
+    --text-result-h:   #f0dfa8;
+    --border:          #c9a44435;
+    --border-mid:      #c9a44455;
+    --border-verse:    #c9a44420;
+    --border-btn:      #c9a44440;
+    --border-input:    #c9a44435;
+    --border-toc:      #c9a44420;
+    --font-ui:         'Lato', sans-serif;
+    --font-heading:    'Playfair Display', serif;
+    --font-arabic:     'Amiri', serif;
+    --radius:          8px;
+    --sidebar-w:       320px;
+}
+
+[data-theme="minimal"] {
+    --bg-page:         #f8f7f4;
+    --bg-sidebar:      #ffffff;
+    --bg-content:      #f8f7f4;
+    --bg-toc:          #ffffff;
+    --bg-toc-active:   #f3ede0;
+    --bg-input:        #f8f7f4;
+    --bg-btn:          #f5f1e7;
+    --bg-btn-hover:    #ebe3d0;
+    --bg-results:      #ffffff;
+    --bg-header:       #ffffff;
+    --bg-footer:       #f3ede0;
+    --accent:          #2d5a27;
+    --accent-dim:      #2d5a2780;
+    --accent-faint:    #2d5a2720;
+    --accent-trace:    #2d5a2710;
+    --text-primary:    #1a1a1a;
+    --text-secondary:  #5a5040;
+    --text-muted:      #8a7e6a;
+    --text-btn:        #3d3528;
+    --text-toc:        #5a5040;
+    --text-toc-active: #2d5a27;
+    --text-verse:      #1a1a1a;
+    --text-hijri:      #5a5040;
+    --text-result:     #5a5040;
+    --text-result-h:   #3d3528;
+    --border:          #e0dbd0;
+    --border-mid:      #ccc8bc;
+    --border-verse:    #e8e4dc;
+    --border-btn:      #d0c4a8;
+    --border-input:    #d0ccc0;
+    --border-toc:      #e8e4dc;
+    --font-ui:         'Raleway', sans-serif;
+    --font-heading:    'Cinzel', serif;
+    --font-arabic:     'Amiri', serif;
+    --radius:          10px;
+    --sidebar-w:       320px;
+}
+
+[data-theme="scholar"] {
+    --bg-page:         #0d1117;
+    --bg-sidebar:      #161b22;
+    --bg-content:      #0d1117;
+    --bg-toc:          #161b22;
+    --bg-toc-active:   #4fa8d512;
+    --bg-input:        #0d1117;
+    --bg-btn:          #21262d;
+    --bg-btn-hover:    #2d333b;
+    --bg-results:      #161b22;
+    --bg-header:       #161b22;
+    --bg-footer:       #161b22;
+    --accent:          #4fa8d5;
+    --accent-dim:      #4fa8d570;
+    --accent-faint:    #4fa8d520;
+    --accent-trace:    #4fa8d510;
+    --text-primary:    #e6edf3;
+    --text-secondary:  #8b949e;
+    --text-muted:      #484f58;
+    --text-btn:        #8b949e;
+    --text-toc:        #8b949e;
+    --text-toc-active: #4fa8d5;
+    --text-verse:      #e6edf3;
+    --text-hijri:      #4fa8d5;
+    --text-result:     #adbac7;
+    --text-result-h:   #e6edf3;
+    --border:          #30363d;
+    --border-mid:      #444c56;
+    --border-verse:    #21262d;
+    --border-btn:      #30363d;
+    --border-input:    #30363d;
+    --border-toc:      #21262d;
+    --font-ui:         'Lato', sans-serif;
+    --font-heading:    'Playfair Display', serif;
+    --font-arabic:     'Amiri', serif;
+    --radius:          7px;
+    --sidebar-w:       320px;
+}
+
+/* ── Scrollbars ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--accent-faint); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-dim); }
+
+body {
+    font-family: var(--font-ui);
+    font-weight: 300;
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;            /* fallback */
+    height: 100dvh;            /* respects mobile browser UI */
+    overflow: hidden;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   HEADER — logo + title 2× bigger, truly centred
+   ════════════════════════════════════════════════════════════════════ */
+header {
+    background-color: var(--bg-header);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 16px;
+    flex-shrink: 0;
+    position: relative;
+    min-height: 92px;
+}
+
+/* 4. Logo + title absolutely centred as one unit */
+#header-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    pointer-events: none;
+}
+#header-center > * { pointer-events: auto; }
+
+#introduction { display: flex; align-items: center; flex-shrink: 0; }
+
+/* 4. Logo 2× bigger: was 46px → 88px */
+.Bismileh {
+    height: 88px;
+    width: auto;
+    filter: drop-shadow(0 0 8px var(--accent-faint));
+}
+
+/* 4. Title 2× bigger: was 1rem → 2rem */
+#introductionTitle {
+    font-family: var(--font-arabic);
+    font-size: 2rem;
+    color: var(--accent);
+    direction: rtl;
+    opacity: 0.85;
+    line-height: 1.6;
+    white-space: nowrap;
+}
+
+/* ── Theme switcher ── */
+#themeSwitcher {
+    display: flex;
+    border: 1px solid var(--border-mid);
+    border-radius: 99px;
+    overflow: hidden;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.theme-btn {
+    background: transparent;
+    border: none;
+    padding: 7px 17px;
+    font-size: 14px;
+    font-family: var(--font-ui);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.theme-btn:hover { background: var(--accent-trace); color: var(--text-primary); }
+.theme-btn.active { background: var(--accent); color: var(--bg-page); font-weight: 600; }
+
+/* ════════════════════════════════════════════════════════════════════
+   MAIN LAYOUT
+   ════════════════════════════════════════════════════════════════════ */
+main { display: flex; flex: 1; overflow: hidden; min-height: 0; }
+article.main { flex: 1; overflow: hidden; display: flex; flex-direction: column; min-width: 0; }
+#content-wrapper { flex: 1; display: flex; overflow: hidden; min-height: 0; background: var(--bg-content); }
+
+/* ════════════════════════════════════════════════════════════════════
+   SIDEBAR
+   ════════════════════════════════════════════════════════════════════ */
+.sidebar1 {
+    width: var(--sidebar-w);
+    min-width: var(--sidebar-w);
+    background-color: var(--bg-sidebar);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex-shrink: 0;
+    height: 100%;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+/* 5. Both date lines same size: 28px */
+#hijriMonth {
+    padding: 16px 18px 14px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.date-gregorian {
+    font-size: 28px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+    font-family: var(--font-ui);
+    line-height: 1.3;
+}
+
+.date-hijri {
+    font-size: 28px;
+    color: var(--text-hijri);
+    font-family: var(--font-arabic);
+    line-height: 1.5;
+    direction: rtl;
+    text-align: right;
+}
+
+#controlsElements { display: flex; flex-direction: column; flex: 1; }
+
+#firstLanguage,
+#multiLanguage,
+#searchControls,
+#toggleButtons {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+}
+
+/* Labels: 24px italic heading font */
+.SelectLanguage {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 24px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    font-family: var(--font-heading);
+    font-style: italic;
+}
+
+.lang-badge {
+    font-size: 11px;
+    background: var(--accent-trace);
+    color: var(--accent-dim);
+    border: 1px solid var(--accent-faint);
+    border-radius: 3px;
+    padding: 2px 6px;
+    font-family: var(--font-ui);
+    font-style: normal;
+}
+
+/* Selects: 21px */
+#languageSelector,
+#SurahLanguageSelector {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-input);
+    border-radius: var(--radius);
+    color: var(--text-primary);
+    font-size: 21px;
+    font-family: var(--font-ui);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+#languageSelector:focus,
+#SurahLanguageSelector:focus { outline: none; border-color: var(--accent-dim); }
+
+/* Language tag stack */
+#langTagsContainer { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+
+.lang-tag-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent-trace);
+    border: 1px solid var(--accent-faint);
+    border-radius: var(--radius);
+    padding: 8px 12px;
+}
+
+.lang-tag-label {
+    font-size: 18px;
+    color: var(--text-secondary);
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.lang-tag-remove {
+    font-size: 18px;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: color 0.15s;
+}
+.lang-tag-remove:hover { color: var(--accent); }
+
+/* Secondary verse: 2/3 of main text */
+.secondary-verse {
+    font-size: var(--trans-font-size, 1.87rem);
+    font-family: var(--font-ui);
+    font-weight: 300;
+    line-height: 1.8;
+    margin-top: 8px;
+    direction: ltr;
+    text-align: left;
+}
+
+/* Search: 21px */
+#searchControls { display: flex; flex-direction: column; gap: 8px; }
+
+#search-input {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-input);
+    border-radius: var(--radius);
+    color: var(--text-primary);
+    font-size: 21px;
+    font-family: var(--font-ui);
+    transition: border-color 0.2s;
+}
+#search-input::placeholder { color: var(--text-muted); }
+#search-input:focus { outline: none; border-color: var(--accent-dim); }
+
+#searDetails { display: flex; flex-direction: column; gap: 6px; }
+
+#arabic-options {
+    font-size: 18px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    direction: rtl;
+}
+#arabic-options input[type="checkbox"] { accent-color: var(--accent); width: 18px; height: 18px; }
+#searchButtons { display: flex; flex-direction: column; gap: 6px; }
+
+/* Buttons: 21px */
+button {
+    font-family: var(--font-ui);
+    font-size: 21px;
+    font-weight: 400;
+    cursor: pointer;
+    border-radius: var(--radius);
+    transition: background 0.18s, color 0.18s;
+}
+
+#searchbutton,
+#searchButtonSourats,
+#toggleOrder,
+#context,
+#khatmBtn {
+    width: 100%;
+    padding: 11px 12px;
+    background: var(--bg-btn);
+    border: 1px solid var(--border-btn);
+    color: var(--text-btn);
+    text-align: left;
+}
+#searchbutton:hover,
+#searchButtonSourats:hover,
+#toggleOrder:hover,
+#context:hover,
+#khatmBtn:hover { background: var(--bg-btn-hover); color: var(--text-primary); }
+
+#toggleButtons { display: flex; flex-direction: column; gap: 6px; }
+
+/* 6. Arabic direction for buttons when Arabic is selected */
+.btn-rtl {
+    text-align: right !important;
+    direction: rtl !important;
+}
+
+/* ── Burger ── */
+.burger-menu {
+    display: none;
+    position: fixed;
+    top: 10px; left: 10px;
+    z-index: 200;
+    font-size: 22px;
+    color: var(--accent);
+    cursor: pointer;
+    background: var(--bg-sidebar);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    width: 40px; height: 40px;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   SEARCH RESULTS — close button at top
+   ════════════════════════════════════════════════════════════════════ */
+.resultsContainer {
+    width: 280px;
+    min-width: 280px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border);
+    background: var(--bg-results);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+#results-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+#results-label {
+    font-size: 16px;
+    color: var(--accent);
+    font-family: var(--font-heading);
+    font-style: italic;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.4;
+}
+
+#reset-button {
+    font-size: 12px;
+    padding: 4px 10px;
+    background: var(--accent-trace);
+    border: 1px solid var(--accent-faint);
+    color: var(--accent);
+    border-radius: 99px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+#reset-button:hover { background: var(--accent-faint); }
+
+.resultsClass {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 16px;
+    font-size: 1rem;
+    color: var(--text-result);
+    line-height: 1.8;
+}
+
+.total-matches {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+}
+
+.surah-results { margin-bottom: 12px; }
+
+.SearchResultSurah {
+    font-family: var(--font-heading);
+    font-size: 17px;
+    color: var(--accent);
+    margin-bottom: 5px;
+    font-weight: 600;
+    font-style: italic;
+}
+
+.search-result-item {
+    cursor: pointer;
+    color: var(--text-result);
+    padding: 5px 0;
+    font-size: 16px;
+    transition: color 0.15s;
+    border-bottom: 1px solid var(--border);
+}
+.search-result-item:hover { color: var(--text-result-h); }
+
+/* ════════════════════════════════════════════════════════════════════
+   READING PANE — flex:2 = 2/3
+   ════════════════════════════════════════════════════════════════════ */
+.textContainer {
+    flex: 2;
+    padding: 0 48px 36px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: var(--bg-content);
+    border-right: 1px solid var(--border);
+    transition: background-color 0.3s;
+    min-width: 0;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   CONTEXT PANE — 2. text 3× bigger
+   ════════════════════════════════════════════════════════════════════ */
+.sura-contexte {
+    flex: 2;
+    padding: 36px 48px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: var(--bg-content);
+    border-right: 1px solid var(--border);
+    min-width: 0;
+    line-height: 1.8;
+}
+
+/* 2. Context text 3× bigger than before (was ~0.95rem → now ~2.85rem equiv) */
+.sura-contexte h2 {
+    font-family: var(--font-heading);
+    color: var(--accent);
+    font-size: 2.4rem;
+    margin: 28px 0 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    font-style: italic;
+}
+
+.sura-contexte h3 {
+    font-size: 1.8rem;
+    color: var(--text-secondary);
+    margin: 18px 0 8px;
+}
+
+.sura-contexte p {
+    font-size: 1.65rem;
+    color: var(--text-primary);
+    line-height: 1.9;
+    opacity: 0.9;
+}
+
+.sura-contexte .item { margin-bottom: 20px; }
+
+/* ── Surah title — hidden (sticky bar already shows the name) ── */
+#suraTitle {
+    display: none;
+}
+@media print {
+    #suraTitle { display: block; font-family: var(--font-heading); font-size: 1.9rem; color: var(--accent); margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border); font-weight: 600; }
+}
+
+/* ── Verses: 2.8rem ── */
+.sura { width: 100%; }
+
+.verse {
+    padding: 22px 0;
+    border-bottom: 1px solid var(--border-verse);
+    position: relative;
+    color: var(--text-verse);
+    line-height: 2.3;
+    font-family: var(--font-arabic);
+    font-size: var(--verse-font-size, 2.8rem);
+    transition: background 0.15s;
+}
+
+.verse:last-of-type { border-bottom: none; }
+.verse:last-of-type::after {
+    content: "";
+    display: block;
+    width: 40%;
+    height: 1px;
+    background: var(--accent-faint);
+    margin: 16px auto 0;
+    border-radius: 99px;
+}
+
+.right-align { text-align: right; direction: rtl; }
+.verse-icon { display: inline-block; margin-inline-start: 10px; vertical-align: middle; }
+
+.icon-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--accent-faint);
+    background: var(--accent-trace);
+    font-size: 14px;
+    font-family: var(--font-ui);
+    color: var(--accent);
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.highlight { background: var(--accent); color: var(--bg-page); border-radius: 3px; padding: 0 3px; }
+
+/* ════════════════════════════════════════════════════════════════════
+   TOC — flex:1, drag-resizable, 3. original icons, centred header
+   ════════════════════════════════════════════════════════════════════ */
+#tocContainer {
+    flex: 1;
+    min-width: 140px;
+    max-width: 700px;
+    background: var(--bg-toc);
+    border-left: 1px solid var(--border-toc);
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex-shrink: 0;
+    position: relative;
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Drag handle */
+#tocResizeHandle {
+    position: absolute;
+    top: 0; left: 0;
+    width: 8px; height: 100%;
+    cursor: col-resize;
+    z-index: 10;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+}
+#tocResizeHandle::after {
+    content: '';
+    width: 2px; height: 48px;
+    background: var(--accent-faint);
+    border-radius: 2px;
+    transition: background 0.15s;
+}
+#tocResizeHandle:hover,
+#tocResizeHandle.dragging { background: var(--accent-trace); }
+#tocResizeHandle:hover::after,
+#tocResizeHandle.dragging::after { background: var(--accent-dim); }
+
+/* 3. TOC header: bigger (20px), centred, with bottom border */
+.toc-section-label {
+    font-size: 20px;
+    font-family: var(--font-heading);
+    font-style: italic;
+    font-weight: 600;
+    color: var(--accent);
+    text-align: center;
+    padding: 14px 14px 12px 20px;
+    border-bottom: 1px solid var(--border-toc);
+    flex-shrink: 0;
+}
+
+/* TOC scroll area */
+.toc-scroll {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* TOC items: default 26px, scaled by JS drag */
+.toc-item {
+    padding: 10px 14px 10px 16px;
+    font-size: 26px;
+    color: var(--text-toc);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    border-left: 2px solid transparent;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    line-height: 1.3;
+    overflow: hidden;
+}
+.toc-item:hover {
+    background: var(--bg-toc-active);
+    color: var(--text-toc-active);
+    border-left-color: var(--accent-dim);
+}
+.toc-item.toc-active {
+    color: var(--text-toc-active);
+    background: var(--bg-toc-active);
+    border-left-color: var(--accent);
+}
+
+.toc-item-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.toc-item-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.toc-item-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+/* 3. Original city icon images */
+.city-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    opacity: 0.85;
+    flex-shrink: 0;
+}
+
+/* TOC number badge */
+.toc-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--accent-faint);
+    background: var(--accent-trace);
+    font-size: 18px;
+    font-family: var(--font-ui);
+    color: var(--accent);
+    flex-shrink: 0;
+    font-weight: 600;
+}
+
+/* ── Utility ── */
+.eraseDiv {
+    width: 0 !important;
+    height: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    display: none !important;
+    flex-shrink: 0 !important;
+}
+
+footer {
+    background: var(--bg-footer);
+    border-top: 1px solid var(--border);
+    text-align: center;
+    padding: 11px 7px;
+    font-size: 16px;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+    opacity: 1;
+    font-family: var(--font-ui);
+    font-style: normal;
+    letter-spacing: 0.02em;
+}
+
+/* Phone: hide footer — version lives in settings sheet */
+@media (max-width: 767px) {
+    #appFooter { display: none; }
+}
+
+/* Desktop sidebar version tag */
+.sidebar-version {
+    flex-shrink: 0;
+    padding: 10px 18px;
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: var(--font-ui);
+    opacity: 0.65;
+    border-top: 1px solid var(--border);
+    letter-spacing: 0.04em;
+}
+
+/* Phone: hide sidebar version (it's in the settings sheet instead) */
+@media (max-width: 767px) {
+    .sidebar-version { display: none; }
+}
+
+/* Secondary surah name inside sticky title (when translation language added) */
+.sura-secondary-name {
+    display: block;
+    font-size: 0.68em;
+    font-weight: 400;
+    font-style: italic;
+    opacity: 0.82;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-top: 2px;
+    line-height: 1.3;
+}
+
+/* Sepia theme: fix native dropdown option text colour */
+[data-theme="manuscript"] select option {
+    background-color: #1a1208;
+    color: #f5ecce;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   THEME OVERRIDES
+   ════════════════════════════════════════════════════════════════════ */
+
+/* Manuscript: sharper font rendering on dark background */
+[data-theme="manuscript"] {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+[data-theme="manuscript"] .verse { padding: 26px 4px; }
+[data-theme="manuscript"] .secondary-verse { color: #c9a444cc; }
+[data-theme="manuscript"] #suraTitle::before,
+[data-theme="manuscript"] #suraTitle::after {
+    content: '⬧';
+    font-size: 0.45em;
+    opacity: 0.35;
+    margin: 0 10px;
+    vertical-align: middle;
+}
+[data-theme="manuscript"] .textContainer,
+[data-theme="manuscript"] .sura-contexte {
+    background: linear-gradient(180deg, #1a1208 0%, #160f06 100%);
+}
+
+[data-theme="minimal"] .verse {
+    border: 1px solid var(--border-verse);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 8px #2d5a2710;
+}
+[data-theme="minimal"] .verse:last-of-type::after { display: none; }
+[data-theme="minimal"] #suraTitle { font-size: 1.6rem; }
+
+[data-theme="scholar"] .verse {
+    border: 1px solid var(--border-verse);
+    border-radius: var(--radius);
+    padding: 18px 22px 18px 20px;
+    margin-bottom: 12px;
+    border-left: 2px solid var(--accent-faint);
+    box-shadow: 0 1px 6px #00000035;
+    transition: border-left-color 0.2s;
+}
+[data-theme="scholar"] .verse:hover { border-left-color: var(--accent-dim); }
+[data-theme="scholar"] .verse:last-of-type::after { display: none; }
+[data-theme="scholar"] .secondary-verse { color: #adbac7; }
+
+/* ════════════════════════════════════════════════════════════════════
+   SIDEBAR HEADER (mobile close button)
+   ════════════════════════════════════════════════════════════════════ */
+#sidebarHeader {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+#sidebarTitle {
+    font-family: var(--font-arabic);
+    font-size: 20px;
+    color: var(--accent);
+    font-style: italic;
+}
+
+#sidebarCloseBtn {
+    font-size: 18px;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: auto;
+    padding: 2px 6px;
+    border-radius: 4px;
+    line-height: 1;
+}
+#sidebarCloseBtn:hover { color: var(--accent); }
+
+/* ════════════════════════════════════════════════════════════════════
+   SIDEBAR OVERLAY (mobile backdrop)
+   ════════════════════════════════════════════════════════════════════ */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #00000060;
+    z-index: 90;
+    backdrop-filter: blur(2px);
+}
+.sidebar-overlay.active { display: block; }
+
+/* ════════════════════════════════════════════════════════════════════
+   BOTTOM NAV (tablet + mobile only)
+   ════════════════════════════════════════════════════════════════════ */
+.bottom-nav {
+    display: none;
+    background: var(--bg-header);
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+    z-index: 50;
+}
+
+.bnav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 8px 4px 10px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    border-top: 2px solid transparent;
+    transition: background 0.15s, border-color 0.15s;
+    width: auto;
+}
+
+.bnav-btn.bnav-active {
+    background: var(--accent-trace);
+    border-top-color: var(--accent);
+}
+
+/* Pill wrapper — transparent by default, gains background on phone active state */
+.bnav-pill {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 4px 14px;
+    border-radius: 20px;
+    transition: background 0.2s;
+}
+
+.bnav-ico {
+    font-size: 20px;
+    line-height: 1;
+    display: block;
+}
+
+.bnav-lbl {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-family: var(--font-ui);
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+}
+
+.bnav-btn.bnav-active .bnav-lbl { color: var(--accent); }
+
+/* ── Phone progress bar (hidden on desktop/tablet) ── */
+.surah-progress-bar {
+    display: none;
+    height: 3px;
+    background: var(--border);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 9;
+}
+.surah-progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width 0.25s ease;
+}
+
+/* ── Phone left drawer (hidden by default) ── */
+.mob-drawer {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    width: 280px;
+    background: var(--bg-sidebar);
+    border-right: 1px solid var(--border);
+    z-index: 1100;
+    transform: translateX(-100%);
+    transition: transform 0.28s ease;
+    flex-direction: column;
+    overflow-y: auto;
+}
+.mob-drawer.open { transform: translateX(0); }
+.mob-drawer-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1099;
+}
+.mob-drawer-overlay.active { display: block; }
+
+
+
+/* ════════════════════════════════════════════════════════════════════
+   RESPONSIVE — 1200px (hide TOC)
+   ════════════════════════════════════════════════════════════════════ */
+@media (max-width: 1200px) {
+    #tocContainer { display: none; }
+    .textContainer, .sura-contexte { flex: 1; }
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   RESPONSIVE — 900px TABLET
+   ════════════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+    /* Header: compact, logo smaller */
+    header {
+        padding: 8px 14px;
+        min-height: 60px;
+        justify-content: space-between;
+    }
+    #header-center {
+        position: static;
+        transform: none;
+        flex: 1;
+        gap: 10px;
+        justify-content: center;
+    }
+    .Bismileh { height: 40px; }
+    #introductionTitle { font-size: 0.9rem; }
+    #themeSwitcher { flex-shrink: 0; }
+    .theme-btn { font-size: 12px; padding: 5px 11px; }
+
+    /* Burger visible on all mobile/tablet (opens settings sheet; phone uses drawer) */
+    .burger-menu { display: flex; }
+
+    /* Sidebar: full-height drawer */
+    .sidebar1 {
+        position: fixed;
+        top: 0; left: 0;
+        height: 100vh;
+        height: 100dvh;
+        z-index: 100;
+        transform: translateX(-100%);
+        transition: transform 0.28s cubic-bezier(.4,0,.2,1);
+        width: 320px;
+        min-width: 320px;
+        box-shadow: 6px 0 32px #00000060;
+    }
+    .sidebar1.open { transform: translateX(0); }
+    #sidebarHeader { display: flex; }
+
+    /* Reading area full width */
+    .textContainer {
+        padding: 0 24px 20px;
+        flex: 1;
+    }
+    .sura-contexte {
+        padding: 20px 24px;
+        flex: 1;
+    }
+    /* v9.11: don't override font-size — let user's slider control it */
+    #suraTitle { font-size: 1.2rem; }
+
+    /* Search results narrower */
+    .resultsContainer { width: 220px; min-width: 220px; }
+
+    /* Bottom nav visible */
+    .bottom-nav { display: flex; }
+
+    /* main needs padding-bottom for bottom nav */
+    main { padding-bottom: 0; }
+    body { padding-bottom: 0; }
+
+    /* Bookmarks panel narrower */
+    .bookmarksContainer { width: 200px; min-width: 200px; }
+
+    /* Sidebar font sizes slightly reduced */
+    .SelectLanguage { font-size: 18px; }
+    .date-gregorian { font-size: 18px; }
+    .date-hijri { font-size: 22px; }
+    #languageSelector, #SurahLanguageSelector { font-size: 16px; }
+    #searchbutton, #searchButtonSourats, #toggleOrder, #context, #bookmarksBtn { font-size: 16px; padding: 9px 10px; }
+    #search-input { font-size: 16px; }
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   RESPONSIVE — 600px MOBILE
+   ════════════════════════════════════════════════════════════════════ */
+@media (max-width: 600px) {
+    /* Header: minimal */
+    header {
+        padding: 8px 12px;
+        min-height: 52px;
+        gap: 8px;
+    }
+    #header-center { gap: 8px; }
+    .Bismileh { height: 32px; }
+    #introductionTitle { font-size: 0.75rem; line-height: 1.4; }
+    /* Hide theme switcher from header — accessible from settings in bottom nav */
+    #themeSwitcher { display: none; }
+
+    /* Sidebar narrower on mobile */
+    .sidebar1 { width: 290px; min-width: 290px; }
+
+    /* Reading padding tighter */
+    .textContainer { padding: 0 16px 14px; }
+    .sura-contexte { padding: 14px 16px; }
+    /* v9.11: verse font-size respects slider — only set line-height here */
+    .verse { line-height: 2; }
+    #suraTitle { font-size: 1.05rem; }
+
+    /* v9.7: Hide desktop search/bookmarks panels entirely on mobile.
+       The mobile sheet handles both — desktop panels would be redundant overlays. */
+    .resultsContainer,
+    .bookmarksContainer {
+        display: none !important;
+    }
+
+    /* Mobile search bar visible */
+    /* mobile-search-bar removed in v9.5 */
+
+    /* Hide desktop search controls in sidebar on mobile
+       (search is handled by mobile search bar) */
+    #searchControls { display: none; }
+
+    /* Verse action buttons bigger tap targets */
+    .verse-action-btn { padding: 5px 14px; font-size: 15px; }
+
+    /* v10.5: Bottom nav labels readable on mobile */
+    .bnav-lbl { font-size: 14px; }
+    .bnav-ico { font-size: 22px; }
+
+    /* font sliders full width */
+    .font-slider-row { gap: 6px; }
+
+    /* Note modal full screen on mobile */
+    .note-modal {
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+        max-width: 100vw;
+    }
+    .note-modal-overlay { align-items: flex-end; }
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   RESPONSIVE — 380px SMALL MOBILE
+   ════════════════════════════════════════════════════════════════════ */
+@media (max-width: 380px) {
+    .Bismileh { height: 26px; }
+    #introductionTitle { font-size: 0.65rem; }
+    /* v9.11: verse font-size respects slider */
+    #suraTitle { font-size: 0.95rem; }
+    .bnav-btn { padding: 6px 2px 8px; }
+    .bnav-ico { font-size: 20px; }
+    .bnav-lbl { font-size: 13px; }
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   SAFE AREA (notched phones — iPhone etc.)
+   ════════════════════════════════════════════════════════════════════ */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+    .bottom-nav { padding-bottom: env(safe-area-inset-bottom); }
+
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   v9 NEW FEATURES
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ── Font size slider ── */
+#fontSizeSection {
+    padding: 12px 18px 10px;
+    border-bottom: 1px solid var(--border);
+}
+
+.font-slider-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.font-slider-label {
+    font-size: 20px;
+    color: var(--accent);
+    font-family: var(--font-arabic);
+    width: 28px;
+    text-align: center;
+    flex-shrink: 0;
+}
+/* v9.11: text labels (Verse/Translation) instead of letters */
+.font-slider-label-text {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-style: italic;
+    width: 78px;
+    text-align: left;
+}
+
+input[type="range"] {
+    flex: 1;
+    accent-color: var(--accent);
+    height: 4px;
+    cursor: pointer;
+}
+
+.font-slider-val {
+    font-size: 13px;
+    color: var(--text-primary);
+    width: 36px;
+    text-align: right;
+    flex-shrink: 0;
+    opacity: 0.85;
+    background: var(--accent-trace);
+    border-radius: 4px;
+    padding: 2px 6px;
+}
+
+/* ── TOC Tabs ── */
+#tocTabRow {
+    display: flex;
+    border-bottom: 1px solid var(--border-toc);
+    flex-shrink: 0;
+    padding: 6px 8px 0;
+    gap: 4px;
+    padding-left: 16px;
+}
+
+.toc-tab {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 6px 12px 8px;
+    font-size: 20px;
+    font-family: var(--font-ui);
+    color: var(--text-muted);
+    cursor: pointer;
+    border-radius: 0;
+    transition: color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+}
+
+.toc-tab:hover { color: var(--text-primary); }
+
+.toc-tab.toc-tab-active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    font-weight: 600;
+}
+
+/* ── Juz TOC items ── */
+.juz-item {
+    padding: 10px 14px 10px 16px;
+    font-size: 22px;
+    color: var(--text-toc);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-left: 2px solid transparent;
+    transition: background 0.15s, color 0.15s;
+    line-height: 1.3;
+    overflow: hidden;
+}
+
+.juz-item:hover,
+.juz-item.toc-active {
+    background: var(--bg-toc-active);
+    color: var(--text-toc-active);
+    border-left-color: var(--accent);
+}
+
+.juz-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1px solid var(--accent-faint);
+    background: var(--accent-trace);
+    font-size: 18px;
+    font-family: var(--font-ui);
+    color: var(--accent);
+    flex-shrink: 0;
+    font-weight: 600;
+}
+
+.juz-info { flex: 1; min-width: 0; overflow: hidden; }
+
+.juz-name {
+    display: block;
+    font-family: var(--font-heading);
+    font-style: italic;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.juz-sub {
+    display: block;
+    font-size: 0.55em;
+    color: var(--text-primary);
+    margin-top: 2px;
+    opacity: 0.78;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ── Reading history badge in TOC ── */
+.toc-item-name .history-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent-dim);
+    margin-left: 6px;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+
+/* v10.12: Green dot — indicates the surah has at least one saved item */
+.toc-item-name .saved-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #4caf50;
+    margin-left: 5px;
+    vertical-align: middle;
+    flex-shrink: 0;
+    box-shadow: 0 0 4px rgba(76,175,80,0.5);
+}
+
+/* ── Verse highlighted state ── */
+.verse.verse-highlighted {
+    background: var(--accent-trace) !important;
+    border-left: 3px solid var(--accent);
+    padding-left: 10px;
+}
+
+/* ── Verse action row (highlight + bookmark + note buttons) ── */
+.verse-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.verse:hover .verse-actions { opacity: 1; }
+
+.verse-action-btn {
+    background: transparent;
+    border: 1px solid var(--accent-faint);
+    border-radius: 99px;
+    padding: 3px 10px;
+    font-size: 13px;
+    color: var(--accent-dim);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    font-family: var(--font-ui);
+    width: auto;
+}
+
+.verse-action-btn:hover {
+    background: var(--accent-trace);
+    color: var(--accent);
+}
+
+.verse-action-btn.active {
+    background: var(--accent-trace);
+    color: var(--accent);
+    border-color: var(--accent-dim);
+}
+
+/* note dot indicator */
+.note-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-left: 4px;
+    vertical-align: middle;
+}
+
+/* ── Note modal ── */
+.note-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: #00000070;
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.note-modal {
+    background: var(--bg-sidebar);
+    border: 1px solid var(--border-mid);
+    border-radius: 12px;
+    width: 480px;
+    max-width: 90vw;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.note-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 16px;
+    font-family: var(--font-heading);
+    color: var(--accent);
+    font-style: italic;
+}
+
+.note-modal-header button {
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    color: var(--text-muted);
+    cursor: pointer;
+    width: auto;
+    padding: 0 4px;
+}
+
+#noteModalText {
+    width: 100%;
+    min-height: 120px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-input);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    font-size: 16px;
+    font-family: var(--font-ui);
+    color: var(--text-primary);
+    resize: vertical;
+}
+
+#noteModalText:focus { outline: none; border-color: var(--accent-dim); }
+
+.note-modal-footer {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+#noteModalSave {
+    padding: 8px 18px;
+    background: var(--accent);
+    color: var(--bg-page);
+    border: none;
+    border-radius: var(--radius);
+    font-size: 14px;
+    cursor: pointer;
+    width: auto;
+}
+
+#noteModalDelete {
+    padding: 8px 18px;
+    background: #d9707018;
+    border: 1px solid #d9707060;
+    color: #d97070;
+    border-radius: var(--radius);
+    font-size: 14px;
+    cursor: pointer;
+    width: auto;
+    font-weight: 600;
+}
+
+#noteModalDelete:hover { background: #d9707030; border-color: #d97070; color: #c44; }
+
+/* ── Bookmarks panel ── */
+.bookmarksContainer {
+    width: 300px;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border);
+    background: var(--bg-results);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+#bookmarks-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+#bookmarks-label {
+    font-size: 15px;
+    color: var(--accent);
+    font-family: var(--font-heading);
+    font-style: italic;
+    flex: 1;
+}
+
+#bookmarksClose {
+    font-size: 12px;
+    padding: 4px 10px;
+    background: var(--accent-trace);
+    border: 1px solid var(--accent-faint);
+    color: var(--accent);
+    border-radius: 99px;
+    width: auto;
+    white-space: nowrap;
+}
+
+#bookmarks-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+}
+
+.bookmark-item {
+    padding: 8px 14px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+}
+
+.bookmark-item:hover { background: var(--bg-toc-active); }
+
+.bookmark-surah {
+    font-size: 14px;
+    color: var(--accent);
+    font-family: var(--font-heading);
+    font-style: italic;
+    margin-bottom: 2px;
+}
+
+.bookmark-verse {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.bookmark-remove {
+    float: right;
+    font-size: 12px;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: auto;
+    padding: 0;
+    line-height: 1;
+}
+
+.bookmark-remove:hover { color: var(--accent); }
+
+.bookmarks-empty {
+    padding: 20px 14px;
+    font-size: 13px;
+    color: var(--text-muted);
+    text-align: center;
+    line-height: 1.6;
+}
+
+/* ── #bookmarksBtn in sidebar ── */
+#bookmarksBtn {
+    width: 100%;
+    padding: 11px 12px;
+    background: var(--bg-btn);
+    border: 1px solid var(--border-btn);
+    color: var(--text-btn);
+    text-align: left;
+    font-size: 21px;
+}
+#bookmarksBtn:hover { background: var(--bg-btn-hover); color: var(--text-primary); }
+
+/* ── Search history chips ── */
+#searchHistoryRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    min-height: 0;
+}
+
+.search-chip {
+    background: var(--accent-trace);
+    border: 1px solid var(--accent-faint);
+    border-radius: 99px;
+    padding: 3px 10px;
+    font-size: 13px;
+    color: var(--accent);
+    cursor: pointer;
+    white-space: nowrap;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: background 0.15s, color 0.15s;
+    opacity: 0.9;
+}
+
+.search-chip:hover {
+    background: var(--accent-faint);
+    color: var(--accent);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   MOBILE BOTTOM SHEET (desktop: hidden, mobile: all panels)
+   ════════════════════════════════════════════════════════════════════ */
+.mob-sheet-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #00000070;
+    z-index: 200;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+}
+
+.mob-sheet-overlay.active { display: block; }
+
+.mob-sheet {
+    display: none;
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    background: var(--bg-sidebar);
+    border-top: 1px solid var(--border-mid);
+    border-radius: 18px 18px 0 0;
+    z-index: 210;
+    flex-direction: column;
+    max-height: 85vh;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+}
+
+.mob-sheet.ready { display: flex; }
+.mob-sheet.open  { transform: translateY(0); }
+
+.mob-sheet-grab {
+    flex-shrink: 0;
+    padding: 10px 0 6px;
+    cursor: grab;
+    touch-action: none;
+    display: flex;
+    justify-content: center;
+    user-select: none;
+    -webkit-user-select: none;
+}
+.mob-sheet-grab:active { cursor: grabbing; }
+
+.mob-sheet-handle {
+    width: 44px; height: 5px;
+    background: var(--accent-dim);
+    border-radius: 3px;
+    transition: width 0.15s, background 0.15s;
+}
+.mob-sheet-grab:hover .mob-sheet-handle,
+.mob-sheet-grab:active .mob-sheet-handle,
+.mob-sheet.dragging .mob-sheet-handle {
+    width: 60px;
+    background: var(--accent);
+}
+
+/* When dragging, disable the slide-up transition so the sheet follows the finger */
+.mob-sheet.dragging { transition: none; }
+
+.mob-sheet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px 12px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.mob-sheet-title {
+    font-size: 22px;
+    color: var(--accent);
+    font-family: var(--font-heading);
+    font-style: italic;
+    flex: 1;
+}
+
+.mob-sheet-close {
+    font-size: 16px;
+    color: var(--text-muted);
+    background: var(--accent-trace);
+    border: 1px solid var(--accent-faint);
+    border-radius: 99px;
+    padding: 4px 12px;
+    cursor: pointer;
+    width: auto;
+    flex-shrink: 0;
+    color: var(--accent);
+}
+
+.mob-sheet-body {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* ── Surah list inside sheet ── */
+.mob-surah-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.12s;
+}
+
+.mob-surah-item:hover,
+.mob-surah-item:active { background: var(--bg-toc-active); }
+
+.mob-surah-item.active-surah {
+    background: var(--bg-toc-active);
+    border-left: 3px solid var(--accent);
+}
+
+.mob-surah-city { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; opacity: 0.8; }
+.mob-city-makkah  { background: var(--city-makkah,  #c9a444); }
+.mob-city-madinah { background: var(--city-madinah, #5aaa80); }
+
+.mob-surah-name { font-size: 18px; color: var(--text-toc); flex: 1; line-height: 1.3; }
+.mob-surah-item.active-surah .mob-surah-name { color: var(--text-toc-active); }
+
+.mob-surah-num {
+    font-size: 13px; color: var(--accent-dim);
+    background: var(--accent-trace);
+    border: 1px solid var(--accent-faint);
+    border-radius: 50%;
+    width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-family: var(--font-ui);
+    font-weight: 600;
+}
+
+/* ── Juz list inside sheet ── */
+.mob-juz-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.12s;
+}
+.mob-juz-item:hover,
+.mob-juz-item:active { background: var(--bg-toc-active); }
+
+.mob-juz-num {
+    font-size: 16px; font-weight: 600; color: var(--accent);
+    background: var(--accent-trace); border: 1px solid var(--accent-faint);
+    border-radius: 50%; width: 38px; height: 38px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-family: var(--font-ui);
+}
+
+.mob-juz-info { flex: 1; min-width: 0; }
+.mob-juz-ar { font-size: 16px; color: var(--text-primary); font-family: var(--font-heading); font-style: italic; }
+.mob-juz-sub {
+    font-size: 13px;
+    color: var(--text-primary);
+    margin-top: 2px;
+    opacity: 0.78;
+}
+
+/* ── Search results inside sheet ── */
+.mob-results-total {
+    font-size: 14px;
+    color: var(--text-primary);
+    font-style: italic;
+    font-weight: 600;
+    padding: 11px 18px;
+    border-bottom: 1px solid var(--border);
+    opacity: 0.95;
+}
+
+.mob-results-surah {
+    font-size: 17px;
+    color: var(--accent);
+    font-family: var(--font-heading);
+    font-style: italic;
+    font-weight: 700;
+    padding: 12px 18px 5px;
+    letter-spacing: 0.02em;
+}
+
+.mob-results-verse {
+    font-size: 15px;
+    color: var(--text-primary);
+    padding: 11px 18px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: background 0.12s;
+    opacity: 0.92;
+}
+
+.mob-results-verse:hover,
+.mob-results-verse:active { background: var(--bg-toc-active); color: var(--text-result-h); }
+
+.mob-results-arrow { font-size: 16px; color: var(--accent); flex-shrink: 0; }
+
+.mob-results-empty {
+    padding: 30px 20px;
+    font-size: 15px;
+    color: var(--text-primary);
+    text-align: center;
+    line-height: 1.7;
+    opacity: 0.92;
+}
+
+/* ── Bookmarks inside sheet ── */
+.mob-bm-item {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.12s;
+}
+.mob-bm-item:hover,
+.mob-bm-item:active { background: var(--bg-toc-active); }
+
+.mob-bm-surah {
+    font-size: 16px;
+    color: var(--accent);
+    font-style: italic;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+.mob-bm-verse {
+    font-size: 14px;
+    color: var(--text-primary);
+    line-height: 1.55;
+    opacity: 0.9;
+}
+
+/* ── Settings inside sheet ── */
+.mob-settings-section { padding: 12px 20px; border-bottom: 1px solid var(--border); }
+
+/* Version line at the bottom of the phone settings sheet */
+.mob-settings-version {
+    text-align: center;
+    padding: 14px 20px 18px;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: var(--font-ui);
+    opacity: 0.6;
+    letter-spacing: 0.04em;
+}
+.mob-settings-lbl { font-size: 16px; font-style: italic; color: var(--text-muted); margin-bottom: 8px; font-family: var(--font-heading); }
+.mob-settings-select {
+    width: 100%; background: var(--bg-input); border: 1px solid var(--border-input);
+    border-radius: var(--radius); padding: 10px 12px;
+    font-size: 17px; color: var(--text-primary); font-family: var(--font-ui);
+    appearance: none;
+}
+.mob-settings-btn {
+    width: 100%; background: var(--bg-btn); border: 1px solid var(--border-btn);
+    border-radius: var(--radius); padding: 11px 12px;
+    font-size: 17px; color: var(--text-btn); text-align: left;
+    cursor: pointer; margin-bottom: 6px; font-family: var(--font-ui);
+}
+.mob-settings-btn:last-child { margin-bottom: 0; }
+.mob-theme-chips { display: flex; gap: 6px; }
+.mob-theme-chip {
+    flex: 1; padding: 9px 4px;
+    background: var(--bg-btn); border: 1px solid var(--border-btn);
+    border-radius: var(--radius); font-size: 12px;
+    color: var(--text-secondary); cursor: pointer; text-align: center;
+    font-family: var(--font-ui); transition: all 0.15s;
+}
+.mob-theme-chip.active { background: var(--accent); color: var(--bg-page); border-color: transparent; font-weight: 600; }
+
+/* ── Slider in settings sheet ── */
+.mob-slider-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.mob-slider-label { font-size: 12px; font-style: italic; color: var(--accent); font-family: var(--font-ui); width: 80px; text-align: left; flex-shrink: 0; }
+.mob-slider-val { font-size: 13px; color: var(--text-muted); width: 36px; text-align: right; }
+
+/* Only show sheet on mobile/tablet */
+@media (min-width: 901px) {
+    .mob-sheet, .mob-sheet-overlay { display: none !important; }
+    #bottomNav { display: none !important; }
+    .mobile-search-bar { display: none !important; }
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   MOBILE FIX STYLES
+   ════════════════════════════════════════════════════════════════════ */
+
+/* Fix 1 — Search peek bar (stays visible while sheet is open) */
+.mob-search-peek {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: var(--accent-trace);
+    border-top: 1px solid var(--accent-faint);
+    flex-shrink: 0;
+    transition: opacity 0.5s;
+}
+
+.mob-peek-icon {
+    font-size: 16px;
+    color: var(--accent);
+    flex-shrink: 0;
+}
+
+.mob-peek-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: var(--font-ui);
+}
+
+.mob-peek-close {
+    font-size: 12px;
+    padding: 5px 12px;
+    background: var(--accent);
+    color: var(--bg-page);
+    border: none;
+    border-radius: 99px;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: var(--font-ui);
+    font-weight: 600;
+    width: auto;
+    flex-shrink: 0;
+}
+
+/* Fix 2+3 — Language tag rows inside settings sheet */
+.mob-lang-tag-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent-trace);
+    border: 1px solid var(--accent-faint);
+    border-radius: var(--radius);
+    padding: 7px 10px;
+    margin-bottom: 6px;
+}
+
+.mob-lang-tag-lbl {
+    font-size: 14px;
+    flex: 1;
+    font-family: var(--font-ui);
+}
+
+.mob-lang-tag-rm {
+    font-size: 14px;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0 2px;
+    width: auto;
+    line-height: 1;
+    transition: color 0.15s;
+}
+
+.mob-lang-tag-rm:hover { color: var(--accent); }
+
+
+/* ════════════════════════════════════════════════════════════════════
+   v9.3 — Search scope toggle + Arabic diacritic option in search sheet
+   ════════════════════════════════════════════════════════════════════ */
+
+/* Search scope toggle (This Surah / Whole Quran) */
+.mob-search-scope {
+    display: flex;
+    gap: 6px;
+    padding: 10px 14px;
+    background: var(--bg-input);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.mob-scope-btn {
+    flex: 1;
+    padding: 8px 6px;
+    background: transparent;
+    border: 1px solid var(--border-btn);
+    border-radius: var(--radius);
+    font-size: 13px;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-family: var(--font-ui);
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    width: auto;
+}
+
+.mob-scope-btn.active {
+    background: var(--accent);
+    color: var(--bg-page);
+    border-color: transparent;
+    font-weight: 600;
+}
+
+/* Search input row inside the sheet */
+.mob-search-row {
+    display: flex;
+    gap: 6px;
+    padding: 10px 14px;
+    background: var(--bg-input);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.mob-search-row input {
+    flex: 1;
+    background: var(--bg-sidebar);
+    border: 1px solid var(--border-input);
+    border-radius: var(--radius);
+    padding: 8px 12px;
+    font-size: 15px;
+    color: var(--text-primary);
+    font-family: var(--font-ui);
+}
+
+.mob-search-row input:focus {
+    outline: none;
+    border-color: var(--accent-dim);
+}
+
+.mob-search-row button {
+    background: var(--accent);
+    color: var(--bg-page);
+    border: none;
+    border-radius: var(--radius);
+    padding: 8px 14px;
+    font-size: 16px;
+    cursor: pointer;
+    width: auto;
+    flex-shrink: 0;
+    font-weight: 600;
+}
+
+/* Arabic diacritic option inside search sheet */
+.mob-arabic-opt {
+    padding: 8px 14px;
+    background: var(--accent-trace);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.mob-arabic-opt label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    direction: rtl;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-family: var(--font-ui);
+}
+
+.mob-arabic-opt input[type="checkbox"] {
+    accent-color: var(--accent);
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   v9.3 — Brighter settings labels (readable on Manuscript & Scholar)
+   ════════════════════════════════════════════════════════════════════ */
+.mob-settings-lbl {
+    font-size: 14px !important;
+    color: var(--text-primary) !important;
+    font-style: italic;
+    font-weight: 600 !important;
+    margin-bottom: 8px;
+    font-family: var(--font-heading);
+    letter-spacing: 0.02em;
+    opacity: 0.95;
+}
+/* ════════════════════════════════════════════════════════════════════
+   v9.5 — Reset button, sticky surah title, confirm dialog
+   ════════════════════════════════════════════════════════════════════ */
+
+/* Reset button (desktop bookmarks header) */
+#bookmarksReset {
+    font-size: 12px;
+    padding: 4px 10px;
+    background: #d9707018;
+    border: 1px solid #d9707040;
+    color: #e08585;
+    border-radius: 99px;
+    cursor: pointer;
+    font-weight: 500;
+    width: auto;
+    flex-shrink: 0;
+    white-space: nowrap;
+    margin-right: 6px;
+}
+#bookmarksReset:hover {
+    background: #d9707030;
+    color: #f0a0a0;
+}
+
+/* Mobile reset button inside sheet header */
+.mob-sheet-reset {
+    font-size: 12px;
+    padding: 4px 10px;
+    background: #d9707018;
+    border: 1px solid #d9707040;
+    color: #e08585;
+    border-radius: 99px;
+    cursor: pointer;
+    font-weight: 600;
+    width: auto;
+    flex-shrink: 0;
+    white-space: nowrap;
+    margin-right: 6px;
+}
+.mob-sheet-reset:hover {
+    background: #d9707030;
+    color: #f0a0a0;
+}
+
+/* ── Sticky surah title (top of reading pane) ── */
+.sura-sticky-title {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--bg-content);
+    color: var(--accent);
+    font-family: var(--font-ui);
+    font-style: normal;
+    font-size: 1.15rem;
+    font-weight: 600;
+    text-align: center;
+    padding: 10px 16px 9px;
+    border-bottom: 1px solid var(--border);
+    margin: 0 -48px 6px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* In manuscript mode use the gradient-friendly transparent bg */
+[data-theme="manuscript"] .sura-sticky-title {
+    background: rgba(15, 11, 5, 0.92);
+}
+[data-theme="scholar"] .sura-sticky-title {
+    background: rgba(13, 17, 23, 0.92);
+}
+[data-theme="minimal"] .sura-sticky-title {
+    background: rgba(248, 247, 244, 0.94);
+}
+
+/* Mobile: tighter padding & adjust margin */
+@media (max-width: 900px) {
+    .sura-sticky-title {
+        font-size: 1.15rem;
+        padding: 11px 14px;
+        margin: 0 -24px 4px;
+    }
+}
+@media (max-width: 600px) {
+    .sura-sticky-title {
+        font-size: 1.1rem;
+        padding: 10px 12px;
+        margin: 0 -16px 4px;
+    }
+    .sura-print-pill { font-size: 14px !important; padding: 5px 12px !important; }
+    .sura-print-pill .spp-lbl { font-size: 14px; }
+}
+
+/* ── Confirm dialog ── */
+.confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.confirm-overlay.show { display: flex; }
+
+.confirm-box {
+    background: var(--bg-sidebar);
+    border: 1px solid var(--border-mid);
+    border-radius: 12px;
+    padding: 22px;
+    max-width: 360px;
+    width: 100%;
+    box-shadow: 0 12px 40px #00000060;
+}
+
+.confirm-title {
+    font-size: 17px;
+    color: var(--accent);
+    font-family: var(--font-heading);
+    font-style: italic;
+    margin-bottom: 8px;
+}
+
+.confirm-text {
+    font-size: 14px;
+    color: var(--text-primary);
+    line-height: 1.6;
+    margin-bottom: 18px;
+    opacity: 0.9;
+    font-weight: 400;
+}
+
+.confirm-btns {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.confirm-btn {
+    padding: 8px 16px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    cursor: pointer;
+    border: 1px solid var(--border-btn);
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: var(--font-ui);
+    width: auto;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.confirm-btn:hover {
+    background: var(--bg-btn-hover);
+    color: var(--text-primary);
+}
+
+.confirm-btn.danger {
+    background: #c0392b;
+    border-color: #c0392b;
+    color: white;
+    font-weight: 400;
+}
+.confirm-btn.danger:hover {
+    background: #a93226;
+    color: white;
+}
+
+/* ── Empty bookmarks state — friendlier ── */
+.bookmarks-empty,
+.mob-bookmarks-empty {
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.7;
+}
+.bookmarks-empty-icon,
+.mob-bookmarks-empty-icon {
+    font-size: 40px;
+    opacity: 0.3;
+    margin-bottom: 12px;
+}
+.bookmarks-empty-hint,
+.mob-bookmarks-empty-hint {
+    font-size: 12px;
+    margin-top: 6px;
+    opacity: 0.7;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   v9.6 — MINIMIZE / PEEK BAR / SAVED HUB
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ── Minimize button in sheet header ── */
+.mob-sheet-min {
+    font-size: 13px;
+    color: var(--text-primary);
+    background: var(--accent-trace);
+    border: 1px solid var(--accent-faint);
+    border-radius: 99px;
+    padding: 4px 10px;
+    cursor: pointer;
+    width: auto;
+    flex-shrink: 0;
+    margin-right: 4px;
+    font-family: var(--font-ui);
+    transition: background 0.15s;
+}
+.mob-sheet-min:hover { background: var(--accent-faint); color: var(--accent); }
+
+/* ── Sheet minimized state — slide it down so only the header peeks ── */
+.mob-sheet.minimized {
+    /* Let the peek bar handle visibility instead */
+    transform: translateY(100%);
+}
+
+/* ── Peek bar (floating bar at bottom when sheet is minimized) ── */
+.mob-sheet-peek {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--accent-trace);
+    border-top: 1px solid var(--accent-dim);
+    padding: 11px 14px;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    z-index: 200;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.25);
+    font-family: var(--font-ui);
+    /* Sit above the bottom nav */
+    margin-bottom: 60px;
+}
+.mob-sheet-peek.show { display: flex; }
+
+/* On notched phones, push peek bar above the safe area too */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+    .mob-sheet-peek { margin-bottom: calc(60px + env(safe-area-inset-bottom)); }
+}
+
+.mob-peek-arrow {
+    font-size: 14px;
+    color: var(--accent);
+    flex-shrink: 0;
+}
+
+.mob-peek-label {
+    font-size: 14px;
+    color: var(--text-primary);
+    font-weight: 500;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    opacity: 0.95;
+}
+
+.mob-peek-close-btn {
+    background: var(--bg-sidebar);
+    border: 1px solid var(--accent-faint);
+    color: var(--accent);
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 99px;
+    cursor: pointer;
+    width: auto;
+    flex-shrink: 0;
+    font-weight: 600;
+}
+.mob-peek-close-btn:hover { background: var(--accent); color: var(--bg-page); }
+
+/* ── Saved hub: 3-tab bar inside mobile sheet ── */
+.mob-saved-tabs {
+    display: flex;
+    padding: 6px 8px 0;
+    gap: 3px;
+    background: var(--bg-sidebar);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.mob-saved-tab {
+    padding: 8px 12px 10px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-size: 14px;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-family: var(--font-heading);
+    font-style: italic;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: color 0.15s, border-color 0.15s;
+    width: auto;
+    flex-shrink: 0;
+    opacity: 0.7;
+}
+.mob-saved-tab:hover { opacity: 0.9; }
+
+.mob-saved-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    font-weight: 700;
+    opacity: 1;
+}
+
+/* ── Saved item remove button (✕ on each row, mobile) ── */
+.mob-saved-rm {
+    position: absolute;
+    top: 9px;
+    right: 9px;
+    font-size: 13px;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 7px;
+    border-radius: 5px;
+    line-height: 1;
+    width: auto;
+    z-index: 2;
+    transition: color 0.15s, background 0.15s;
+}
+.mob-saved-rm:hover {
+    color: var(--accent);
+    background: var(--accent-trace);
+}
+
+/* ── Note edit + remove combo (mobile) ── */
+.mob-saved-actions {
+    position: absolute;
+    top: 9px;
+    right: 9px;
+    display: flex;
+    gap: 3px;
+    z-index: 2;
+}
+
+.mob-saved-actions .mob-saved-rm {
+    position: static;
+}
+
+.mob-saved-edit {
+    font-size: 13px;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 7px;
+    border-radius: 5px;
+    line-height: 1;
+    width: auto;
+    transition: color 0.15s, background 0.15s;
+}
+.mob-saved-edit:hover {
+    color: var(--accent);
+    background: var(--accent-trace);
+}
+
+/* ── Note content row (mobile) ── */
+.mob-note-text {
+    font-size: 13px;
+    color: var(--text-primary);
+    line-height: 1.6;
+    margin-top: 4px;
+    padding-right: 56px;
+    word-wrap: break-word;
+}
+
+/* ── Highlight item — gold left border ── */
+.mob-hl-item {
+    border-left: 3px solid var(--accent) !important;
+    padding-left: 11px;
+}
+
+/* Existing mob-bm-item needs position: relative for absolute ✕ button */
+.mob-bm-item {
+    position: relative;
+    padding-right: 56px !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   v9.6 — DESKTOP SAVED HUB (Bookmarks / Notes / Highlights tabs)
+   ════════════════════════════════════════════════════════════════════ */
+
+#saved-tabs {
+    display: flex;
+    padding: 6px 12px 0;
+    gap: 3px;
+    background: var(--bg-results);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    overflow-x: auto;
+}
+
+.saved-tab {
+    padding: 8px 9px 10px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-family: var(--font-heading);
+    font-style: italic;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: color 0.15s, border-color 0.15s;
+    width: auto;
+    flex-shrink: 0;
+}
+
+.saved-tab:hover { color: var(--text-secondary); }
+
+.saved-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    font-weight: 600;
+}
+
+/* ── Note edit/remove combo (desktop) ── */
+.note-actions-row {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    gap: 2px;
+    z-index: 2;
+}
+
+.note-edit-btn {
+    font-size: 12px;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 3px 6px;
+    border-radius: 4px;
+    line-height: 1;
+    width: auto;
+    transition: color 0.15s, background 0.15s;
+}
+.note-edit-btn:hover {
+    color: var(--accent);
+    background: var(--accent-trace);
+}
+
+/* ── Note text preview in desktop saved hub ── */
+.note-text-preview {
+    font-size: 13px;
+    color: var(--text-primary);
+    line-height: 1.55;
+    margin-top: 4px;
+    padding-right: 50px;
+    word-wrap: break-word;
+}
+
+/* ── Desktop highlight item gold left border ── */
+.bookmark-highlight {
+    border-left: 3px solid var(--accent) !important;
+}
+
+/* Make .bookmark-item position relative so ✕ button can absolutely position */
+.bookmark-item {
+    position: relative;
+    padding-right: 36px !important;
+}
+
+/* Bump bookmark-remove styling for note-actions-row alignment */
+.note-actions-row .bookmark-remove {
+    position: static;
+    float: none;
+    font-size: 12px;
+    padding: 3px 6px;
+    line-height: 1;
+}
+
+
+/* ════════════════════════════════════════════════════════════════════
+   v9.8 — Pinch-to-zoom only the reading content
+   ════════════════════════════════════════════════════════════════════ */
+
+/* Reading pane intercepts pinch gestures with JS — no native zoom needed */
+.textContainer,
+.sura-contexte {
+    touch-action: pan-x pan-y;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: text;
+}
+
+/* The inner zoomable wrapper — applied via CSS variable from JS */
+.zoom-wrapper {
+    transform-origin: top center;
+    transform: scale(var(--reading-zoom, 1));
+    transition: transform 0.05s linear;
+    width: 100%;
+}
+
+/* When zoomed in, allow the wrapper to overflow horizontally so user can pan */
+.zoom-wrapper-active {
+    width: calc(100% / var(--reading-zoom, 1));
+}
+
+/* Pinch indicator (briefly shown when user pinches) */
+.zoom-indicator {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.75);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 99px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: var(--font-ui);
+    z-index: 1000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+.zoom-indicator.show { opacity: 1; }
+
+/* ════════════════════════════════════════════════════════════════════
+   v10.13 — Share panel (inside mobile sheet, hidden on desktop)
+   ════════════════════════════════════════════════════════════════════ */
+.mob-share-preview {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+.mob-share-preview-arabic {
+    font-family: var(--font-arabic);
+    font-size: 1.3rem;
+    color: var(--text-primary);
+    line-height: 2;
+    text-align: right;
+    direction: rtl;
+    margin-bottom: 4px;
+}
+.mob-share-preview-trans {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    font-family: var(--font-ui);
+}
+.mob-share-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 16px 14px;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-ui);
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s;
+}
+.mob-share-item:last-child { border-bottom: none; }
+.mob-share-item:hover { background: var(--accent-trace); }
+.mob-share-ico { font-size: 24px; width: 36px; text-align: center; flex-shrink: 0; }
+.mob-share-info { flex: 1; }
+.mob-share-label { font-size: 16px; color: var(--text-primary); font-weight: 500; }
+.mob-share-sub { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+/* ════════════════════════════════════════════════════════════════════
+   PHONE REDESIGN — max-width: 767px  (Groups A–F)
+   DO NOT change desktop layout. These rules are phone-only.
+   ════════════════════════════════════════════════════════════════════ */
+/* Phone settings button — hidden on desktop/tablet */
+.phone-settings-btn {
+    display: none;
+    position: fixed;
+    top: 10px; right: 10px;
+    z-index: 200;
+    width: 40px; height: 40px;
+    font-size: 20px;
+    background: var(--bg-sidebar);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    color: var(--accent);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    padding: 0;
+}
+
+@media (max-width: 767px) {
+    /* Show phone settings icon (hamburger already shown via ≤900px block) */
+    .phone-settings-btn { display: flex; }
+
+    /* Group A — Gold pill active state, 48px tap targets */
+    .bnav-btn {
+        min-height: 48px;
+        border-top: none;
+        padding: 6px 2px 8px;
+    }
+    .bnav-btn.bnav-active {
+        background: transparent;
+        border-top-color: transparent;
+    }
+    .bnav-btn.bnav-active .bnav-pill {
+        background: var(--accent);
+    }
+    .bnav-btn.bnav-active .bnav-lbl {
+        color: var(--bg-content);
+        font-weight: 700;
+    }
+    .bnav-btn.bnav-active .bnav-ico {
+        /* emoji icons don't change color — pill bg is enough */
+    }
+    .bnav-lbl { font-size: 11px; }
+
+    /* Group F — Reading progress bar visible */
+    .surah-progress-bar { display: block; }
+
+    /* Group F — Verse tap highlight */
+    .verse.verse-selected {
+        outline: 2px solid var(--accent);
+        outline-offset: 4px;
+        border-radius: 6px;
+    }
+
+    /* Group E — Left drawer visible/interactive */
+    .mob-drawer { display: flex; }
+    .mob-drawer-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 18px 14px 14px;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+    }
+    .mob-drawer-icon {
+        width: 36px; height: 36px;
+        border-radius: 8px;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+    .mob-drawer-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--accent);
+        font-family: var(--font-ui);
+        flex: 1;
+    }
+    .mob-drawer-close {
+        background: none; border: none;
+        font-size: 18px;
+        color: var(--text-muted);
+        cursor: pointer;
+        width: 32px; height: 32px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 50%;
+        padding: 0;
+    }
+    .mob-drawer-close:hover { background: var(--accent-trace); color: var(--accent); }
+    .mob-drawer-dates {
+        padding: 10px 16px 10px;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+    .mob-drawer-dates:active {
+        background: var(--accent-trace);
+    }
+    .mob-drawer-date-hint {
+        font-size: 11px;
+        color: var(--accent);
+        margin-top: 6px;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+        opacity: 0.85;
+    }
+    .mob-drawer-date-greg {
+        font-size: 15px;
+        color: var(--text-primary);
+        font-family: 'Raleway', sans-serif;
+        font-weight: 400;
+        letter-spacing: 0.02em;
+        opacity: 0.95;
+    }
+    .mob-drawer-date-hijri-line {
+        font-size: 17px;
+        color: var(--accent);
+        font-family: var(--font-ui);
+        font-weight: 700;
+        margin-top: 4px;
+    }
+    .mob-drawer-section-label {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent);
+        font-family: var(--font-ui);
+        padding: 14px 16px 4px;
+        flex-shrink: 0;
+        opacity: 0.85;
+    }
+    .mob-drawer-khatm {
+        padding: 12px 14px 8px;
+        flex-shrink: 0;
+    }
+    .mob-drawer-prog-label {
+        font-size: 12px;
+        color: var(--text-muted);
+        font-family: var(--font-ui);
+        margin-bottom: 6px;
+    }
+    .mob-drawer-prog-bar {
+        height: 4px;
+        background: var(--border);
+        border-radius: 99px;
+        overflow: hidden;
+    }
+    .mob-drawer-prog-fill {
+        height: 100%;
+        background: var(--accent);
+        border-radius: 99px;
+        transition: width 0.3s;
+    }
+    .mob-drawer-nav { flex: 1; padding: 8px 0; }
+    .mob-drawer-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        padding: 14px 16px;
+        background: none;
+        border: none;
+        font-size: 16px;
+        color: var(--text-primary);
+        font-family: var(--font-ui);
+        cursor: pointer;
+        text-align: left;
+        transition: background 0.15s;
+        border-radius: 0;
+    }
+    .mob-drawer-item:hover { background: var(--accent-trace); }
+    .mob-drawer-ico { font-size: 20px; width: 28px; text-align: center; flex-shrink: 0; }
+    .mob-drawer-lbl { flex: 1; }
+    .mob-drawer-chevron { color: var(--text-muted); font-size: 18px; flex-shrink: 0; }
+    .mob-drawer-divider {
+        height: 1px;
+        background: var(--border);
+        margin: 8px 16px;
+    }
+    .mob-drawer-lang-section { padding: 8px 16px 12px; }
+    .mob-drawer-lang-label {
+        font-size: 11px;
+        color: var(--text-muted);
+        font-family: var(--font-ui);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 10px;
+    }
+    .mob-drawer-langs { display: flex; gap: 8px; }
+    .mob-drawer-lang {
+        flex: 1;
+        padding: 8px 4px;
+        background: var(--bg-btn);
+        border: 1px solid var(--border-btn);
+        border-radius: var(--radius);
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        font-family: var(--font-ui);
+        cursor: pointer;
+        text-align: center;
+        transition: all 0.15s;
+    }
+    .mob-drawer-lang.active {
+        background: var(--accent);
+        border-color: transparent;
+        color: var(--bg-page);
+    }
+
+    /* (Group B theme card CSS is defined globally below, not here) */
+
+    /* (Share panel CSS moved to global section below) */
+}
