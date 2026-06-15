@@ -303,11 +303,17 @@ document.getElementById('arabicFontSlider').addEventListener('input', function()
     lsSet(FONT_KEY, fontSizes);
     applyFontSizes();
 });
+document.getElementById('arabicFontSlider').addEventListener('change', function() {
+    if (typeof track === 'function') track('font_size_changed', { type: 'arabic', value: parseFloat(this.value) });
+});
 
 document.getElementById('transFontSlider').addEventListener('input', function() {
     fontSizes.trans = parseFloat(this.value);
     lsSet(FONT_KEY, fontSizes);
     applyFontSizes();
+});
+document.getElementById('transFontSlider').addEventListener('change', function() {
+    if (typeof track === 'function') track('font_size_changed', { type: 'translation', value: parseFloat(this.value) });
 });
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1297,6 +1303,7 @@ document.querySelectorAll('.toc-tab').forEach(function(btn) {
         else if (tab === 'juz')        generateJuzTOC();
         else if (tab === 'revelation') generateRevelationTOC();
         else if (tab === 'topics')     generateTopicsTOC();
+        if (typeof track === 'function') track('toc_tab_switched', { tab: tab });
         saveState();
     });
 });
@@ -1454,6 +1461,7 @@ function handleChooserAction(kind, action, ctx, anchorBtn) {
                 removeBookmark(verseKey(ctx.suraId, ctx.verseIdx));
             } else {
                 addBookmark(ctx.suraId, ctx.verseIdx, ctx.verseText, ctx.suraName);
+                if (typeof track === 'function') track('bookmark_added', { sura: parseInt(ctx.suraId) + 1, verse: ctx.verseIdx + 1 });
             }
         } else if (action === 'note') {
             // Use a fake noteBtn anchor; openNoteModal needs an element to anchor near
@@ -1474,6 +1482,7 @@ function handleChooserAction(kind, action, ctx, anchorBtn) {
             setTimeout(attachAudioButtons, 10);
         }
     } else if (kind === 'share') {
+        if (typeof track === 'function') track('verse_shared', { action: action, sura: parseInt(ctx.suraId) + 1, verse: ctx.verseIdx + 1 });
         if (typeof copyVerseToClipboard === 'function' && action === 'copy') {
             copyVerseToClipboard(ctx.suraId, ctx.verseIdx, ctx.verseText, ctx.suraName);
         } else if (typeof shareVerse === 'function' && action === 'share') {
@@ -1964,12 +1973,20 @@ function setSearchScope(scope) {
 
 document.getElementById('searchbutton').addEventListener('click', function(){
     setSearchScope('quran');
-    const term = document.getElementById('search-input').value.trim(); if (term) searchQuran(term);
+    const term = document.getElementById('search-input').value.trim();
+    if (term) {
+        if (typeof track === 'function') track('search', { scope: 'quran', term_length: term.length });
+        searchQuran(term);
+    }
 });
 
 document.getElementById('searchButtonSourats').addEventListener('click', function(){
     setSearchScope('sura');
-    const term = document.getElementById('search-input').value.trim(); if (term) searchSourat(term);
+    const term = document.getElementById('search-input').value.trim();
+    if (term) {
+        if (typeof track === 'function') track('search', { scope: 'surah', term_length: term.length });
+        searchSourat(term);
+    }
 });
 
 document.getElementById('search-input').addEventListener('keydown', function(e){
@@ -1988,6 +2005,7 @@ document.getElementById('languageSelector').addEventListener('change', function(
     var oldLang = currentLanguage;
     currentLanguage = this.value; isArabic = (currentLanguage === 'arabic');
     if (additionalLanguages.indexOf(currentLanguage) !== -1) removeSecondaryLanguage(currentLanguage);
+    if (typeof track === 'function') track('language_changed', { language: currentLanguage });
     // v10.7: Sync the add-language dropdown so the new primary isn't offered
     // (and the old primary becomes available to add as a translation)
     rebuildAddLangSelector();
@@ -2024,7 +2042,9 @@ function rebuildAddLangSelector() {
 
 document.getElementById('SurahLanguageSelector').addEventListener('change', function(){
     const code = this.value; if (!code) return; this.value = '';
-    if (code === currentLanguage) return; addSecondaryLanguage(code);
+    if (code === currentLanguage) return;
+    if (typeof track === 'function') track('translation_added', { language: code });
+    addSecondaryLanguage(code);
 });
 
 // toggleOrder button removed from sidebar — revelation order is accessible via the TOC tab
@@ -2051,6 +2071,7 @@ document.getElementById('context').addEventListener('click', async function(){
     if (!suraEl) return;
     const suraData = quranData.find(function(s){ return s.id === suraEl.id; });
     if (!suraData) return;
+    if (typeof track === 'function') track('surah_context_opened', { sura: parseInt(suraData.id) + 1 });
     await fetchAndDisplayContext(parseInt(suraData.id) + 1);
 });
 
@@ -2073,7 +2094,12 @@ document.getElementById('bookmarksClose').addEventListener('click', function(){
 // v9.6: bookmarksReset onclick set per-tab in renderSavedHubDesktop
 
 document.querySelectorAll('.theme-btn').forEach(function(btn){
-    btn.addEventListener('click', function(){ applyTheme(btn.getAttribute('data-theme')); saveState(); });
+    btn.addEventListener('click', function(){
+        const theme = btn.getAttribute('data-theme');
+        if (typeof track === 'function') track('theme_changed', { theme: theme });
+        applyTheme(theme);
+        saveState();
+    });
 });
 
 document.getElementById('quranContainer').addEventListener('scroll', function(){
@@ -2380,6 +2406,7 @@ function buildSheetSurahs(body, title) {
         btn.textContent = L[tab];
         btn.addEventListener('click', function() {
             _mobileTocTab = tab;
+            if (typeof track === 'function') track('toc_tab_switched', { tab: tab, surface: 'mobile' });
             buildSheetSurahs(body, title);
         });
         tabsRow.appendChild(btn);

@@ -40,7 +40,8 @@ const DEFAULT_FEATURES = {
     pdfExport:             true,
     readingTimeAnalytics:  true,
     voiceSearch:           true,
-    dailyVerseNotification:false      // v10.10 — opt-in (requires notification permission)
+    dailyVerseNotification:false,     // v10.10 — opt-in (requires notification permission)
+    analyticsOptOut:       false      // v11: anonymous usage stats ON by default (user can opt out)
 };
 
 // v10.9: One-time migration — for users upgrading from v10.8 or earlier,
@@ -115,6 +116,16 @@ function hapticTap(ms) {
     if (navigator.vibrate) {
         try { navigator.vibrate(ms || 10); } catch(e) {}
     }
+}
+
+// v11: Analytics helper — calls umami.track() if loaded and user hasn't opted out
+function track(name, props) {
+    try {
+        if (isFeatureOn('analyticsOptOut')) return;
+        if (typeof umami !== 'undefined' && typeof umami.track === 'function') {
+            umami.track(name, props || {});
+        }
+    } catch(e) {}
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -272,6 +283,7 @@ function buildContinueCard() {
                 }, 200);
             }
         }
+        track('continue_reading_clicked', { sura: info.suraId, verse: info.verseIdx });
         hapticTap(15);
     });
     return card;
@@ -416,12 +428,14 @@ function toggleShortcutsHelp() {
 // ═══════════════════════════════════════════════════════════════════
 function toggleFocusMode() {
     if (!isFeatureOn('focusMode')) return;
-    if (document.body.classList.contains('focus-mode')) {
-        document.body.classList.remove('focus-mode');
-    } else {
+    var entering = !document.body.classList.contains('focus-mode');
+    if (entering) {
         document.body.classList.add('focus-mode');
         window._focusModeActivatedAt = Date.now();
+    } else {
+        document.body.classList.remove('focus-mode');
     }
+    track('focus_mode_toggled', { state: entering ? 'on' : 'off' });
     hapticTap(15);
 }
 
@@ -956,6 +970,7 @@ function recordKhatmCompletion() {
     var k = getKhatmData();
     k.completions.push(new Date().toISOString());
     saveKhatmData(k);
+    track('khatm_completed', { total_completions: k.completions.length });
     showToast('🎉 Khatm completed!');
 }
 
@@ -1306,6 +1321,7 @@ function appendFeaturesUI(body) {
             if (key === 'verseComparison' && !this.checked) {
                 if (typeof closeTafsirCompare === 'function') closeTafsirCompare();
             }
+            track('feature_toggled', { feature: key, state: this.checked ? 'on' : 'off' });
             showToast(this.checked ? '✓ Enabled' : '✗ Disabled');
             hapticTap(10);
         });
@@ -1334,11 +1350,64 @@ function appendFeaturesUI(body) {
         fontSel.appendChild(opt);
     });
     fontSel.value = localStorage.getItem('quranArabicFont') || 'amiri';
-    fontSel.addEventListener('change', function() { applyArabicFont(this.value); });
+    fontSel.addEventListener('change', function() {
+        track('arabic_font_changed', { font: this.value });
+        applyArabicFont(this.value);
+    });
     fontSec.appendChild(fontSel);
     sec.appendChild(fontSec);
 
+    // v11: Analytics opt-out toggle (shown after features list)
+    var analyticsSec = document.createElement('div');
+    analyticsSec.className = 'mob-settings-section';
+    var analyticsLbl = document.createElement('div');
+    analyticsLbl.className = 'mob-settings-lbl';
+    analyticsLbl.textContent = 'Privacy';
+    analyticsSec.appendChild(analyticsLbl);
+
+    var analyticsDescriptions = {
+        arabic:  'مشاركة إحصاءات الاستخدام المجهولة لتحسين التطبيق (لا بيانات شخصية، لا محتوى قرآني)',
+        french:  'Partager des statistiques d\'utilisation anonymes pour améliorer l\'application (sans données personnelles ni contenu coranique)',
+        english: 'Share anonymous usage stats to help improve the app (no personal data, no verse content)',
+        spanish: 'Compartir estadísticas de uso anónimas para mejorar la aplicación (sin datos personales ni contenido coránico)'
+    };
+    var lang = (typeof currentLanguage !== 'undefined') ? currentLanguage : 'english';
+    var analyticsDesc = analyticsDescriptions[lang] || analyticsDescriptions.english;
+
+    var analyticsRow = document.createElement('label');
+    analyticsRow.className = 'feature-toggle-row';
+    var analyticsLblWrap = document.createElement('span');
+    analyticsLblWrap.className = 'feature-toggle-lbl-wrap';
+    var analyticsSpan = document.createElement('span');
+    analyticsSpan.className = 'feature-toggle-lbl';
+    analyticsSpan.textContent = '📊 Anonymous usage stats';
+    var analyticsSub = document.createElement('span');
+    analyticsSub.className = 'feature-toggle-sub';
+    analyticsSub.textContent = analyticsDesc;
+    analyticsLblWrap.appendChild(analyticsSpan);
+    analyticsLblWrap.appendChild(analyticsSub);
+    var analyticsSwWrap = document.createElement('span');
+    analyticsSwWrap.className = 'feature-toggle-sw';
+    var analyticsInp = document.createElement('input');
+    analyticsInp.type = 'checkbox';
+    analyticsInp.checked = !isFeatureOn('analyticsOptOut'); // toggle is ON = tracking ON
+    analyticsInp.addEventListener('change', function() {
+        var current = getFeatures();
+        current.analyticsOptOut = !this.checked; // toggle OFF = opt out
+        saveFeatures(current);
+        showToast(this.checked ? '✓ Usage stats ON' : '✗ Usage stats OFF');
+        hapticTap(10);
+    });
+    var analyticsSlider = document.createElement('span');
+    analyticsSlider.className = 'feature-toggle-slider';
+    analyticsSwWrap.appendChild(analyticsInp);
+    analyticsSwWrap.appendChild(analyticsSlider);
+    analyticsRow.appendChild(analyticsLblWrap);
+    analyticsRow.appendChild(analyticsSwWrap);
+    analyticsSec.appendChild(analyticsRow);
+
     body.appendChild(sec);
+    body.appendChild(analyticsSec);
 }
 
 function appendDataUI(body) {
@@ -2153,6 +2222,8 @@ function appendReadingPlanUI(body) {
 }
 
 function startPlan(planType, customDays) {
+    var totalDays = customDays || { '30days': 30, '60days': 60, '90days': 90 }[planType] || null;
+    track('reading_plan_started', { plan_type: planType, days: totalDays });
     var plan = {
         planType: planType,
         customDays: customDays || null,
@@ -2659,6 +2730,7 @@ function playVerse(suraId, verseIdx) {
         });
     }
 
+    track('audio_played', { sura: parseInt(suraId) + 1, verse: verseIdx + 1, reciter: prefs.reciter });
     // Preload next verse for smooth auto-advance
     preloadNextVerse();
     // Show & highlight
@@ -3057,6 +3129,7 @@ function appendAudioUI(body) {
         var pp = getAudioPrefs();
         pp.repeat = this.value;
         saveAudioPrefs(pp);
+        track('audio_repeat_changed', { mode: this.value });
     });
     rptRow.appendChild(rptLbl); rptRow.appendChild(rptSel);
     sec.appendChild(rptRow);
@@ -3219,6 +3292,8 @@ function fetchTafsir(tafsirId, verseKey) {
 }
 
 function openTafsirModal(suraId, verseIdx, verseText, suraName) {
+    track('tafsir_opened', { sura: parseInt(suraId) + 1, verse: verseIdx + 1 });
+
     var existing = document.getElementById('tafsirModal');
     if (existing) existing.remove();
 
@@ -3786,6 +3861,7 @@ function showDailyVerseNow() {
     try { todayKey = new Date().toISOString().slice(0, 10); } catch(e) { return; }
     var dayNum = parseInt(todayKey.replace(/-/g, ''), 10);
     var verseRef = DAILY_VERSES[dayNum % DAILY_VERSES.length];
+    track('daily_verse_shown', { ref: verseRef, trigger: 'manual' });
     var parts = verseRef.split(':');
     var sNum = parseInt(parts[0]);
     var vNum = parseInt(parts[1]);
@@ -3859,6 +3935,7 @@ function maybeShowDailyVerse() {
     var verse = sura.verses[vNum - 1];
 
     try { localStorage.setItem(DAILY_VERSE_LAST_KEY, todayKey); } catch(e) {}
+    track('daily_verse_shown', { ref: verseRef, trigger: 'auto' });
 
     var overlay = document.createElement('div');
     overlay.id = 'dailyVerseModal';
@@ -3997,6 +4074,7 @@ function openReflectionModal(suraId) {
     document.getElementById('reflectionSave').addEventListener('click', function() {
         var text = document.getElementById('reflectionTextarea').value;
         saveReflection(suraId, text);
+        if (text.trim()) track('reflection_saved', { sura: parseInt(suraId) + 1 });
         if (typeof showToast === 'function') showToast(text.trim() ? labels.saved : labels.cleared);
         close();
     });
@@ -4210,6 +4288,7 @@ function printCurrentSurah() {
     var sura = quranData.find(function(s){ return s.id === String(suraId); });
     if (!sura) return;
 
+    track('print_exported', { sura: parseInt(suraId) + 1 });
     // Build a clean print body
     document.body.classList.add('printing-surah');
     // Inject a print-only "user notes" panel if reflection or notes exist for this surah
@@ -5400,6 +5479,7 @@ function buildHelpMock(type, tabs) {
 function openHelpModal() {
     if (document.getElementById('helpOverlay')) return;
     var lang = (typeof currentLanguage !== 'undefined') ? currentLanguage : 'english';
+    track('help_opened', { lang: lang });
     var strings = HELP_STRINGS[lang] || HELP_STRINGS.english;
     var isRTL = (lang === 'arabic');
 
@@ -5476,7 +5556,7 @@ function openHelpModal() {
         if (fbBtn && !fbBtn._wired) {
             fbBtn._wired = true;
             fbBtn.addEventListener('click', function() {
-                var v = 'v10.15.2';
+                var v = 'v11.0.0';
                 window.open('mailto:contact@amcreatives.ca?subject=Quran%20App%20Feedback&body=Version%3A%20' + v + '%0A%0A', '_blank');
             });
         }
@@ -5524,6 +5604,9 @@ function injectYtSection(suraId) {
         a.rel = 'noopener noreferrer';
         a.className = 'yt-fr-link';
         a.innerHTML = '<span class="yt-fr-icon">&#9654;</span> Regarder la sourate sur YouTube';
+        a.addEventListener('click', function() {
+            track('youtube_link_clicked', { sura: parseInt(suraId) + 1, type: 'surah' });
+        });
         sec.appendChild(a);
         var firstVerse = suraEl.querySelector('.verse');
         if (firstVerse) suraEl.insertBefore(sec, firstVerse);
@@ -5565,6 +5648,9 @@ function appendYtChannelUI(body) {
         '<span class="yt-channel-logo">&#9654;</span>' +
         '<span class="yt-channel-text">Notre chaîne YouTube</span>' +
         '<span class="yt-channel-arr">&#x2197;</span>';
+    a.addEventListener('click', function() {
+        track('youtube_link_clicked', { type: 'channel' });
+    });
     sec.appendChild(a);
     body.appendChild(sec);
 }
