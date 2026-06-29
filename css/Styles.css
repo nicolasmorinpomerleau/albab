@@ -548,6 +548,7 @@ button {
     padding: 0 48px 36px;
     overflow-y: auto;
     overflow-x: hidden;
+    touch-action: pan-y;
     background: var(--bg-content);
     border-right: 1px solid var(--border);
     transition: background-color 0.3s;
@@ -1896,19 +1897,62 @@ input[type="range"] {
 }
 
 /* ── Settings inside sheet ── */
-.mob-settings-section { padding: 12px 20px; border-bottom: 1px solid var(--border); }
+.mob-settings-section { padding: 18px 20px 12px; border-bottom: 1px solid var(--border); }
+
+/* ── Language & Display group: three sections wrapped in one visual block ── */
+.settings-display-group {
+    padding: 18px 20px 12px;
+    border-bottom: 1px solid var(--border);
+}
+.settings-display-group-inner {
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 4px;
+}
+.settings-display-group-inner .mob-settings-section {
+    border-bottom: 1px solid var(--border);
+    padding: 14px 16px 10px;
+    margin: 0;
+}
+.settings-display-group-inner .mob-settings-section:last-child {
+    border-bottom: none;
+}
 
 /* Version line at the bottom of the phone settings sheet */
 .mob-settings-version {
     text-align: center;
-    padding: 14px 20px 18px;
-    font-size: 12px;
-    color: var(--text-muted);
+    padding: 16px 20px 20px;
+    font-size: 24px;
+    color: var(--accent);
     font-family: var(--font-ui);
-    opacity: 0.6;
-    letter-spacing: 0.04em;
+    font-weight: 600;
+    opacity: 0.85;
+    letter-spacing: 0.06em;
+    border-top: 1px solid var(--border);
+    margin-top: 4px;
 }
-.mob-settings-lbl { font-size: 16px; font-style: italic; color: var(--text-muted); margin-bottom: 8px; font-family: var(--font-heading); }
+.mob-settings-lbl {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-family: var(--font-ui);
+    margin: 4px 0 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+}
+.mob-settings-lbl::before,
+.mob-settings-lbl::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--accent);
+    opacity: 0.35;
+}
 .mob-settings-select {
     width: 100%; background: var(--bg-input); border: 1px solid var(--border-input);
     border-radius: var(--radius); padding: 10px 12px;
@@ -2129,14 +2173,14 @@ input[type="range"] {
    v9.3 — Brighter settings labels (readable on Manuscript & Scholar)
    ════════════════════════════════════════════════════════════════════ */
 .mob-settings-lbl {
-    font-size: 14px !important;
-    color: var(--text-primary) !important;
-    font-style: italic;
-    font-weight: 600 !important;
-    margin-bottom: 8px;
-    font-family: var(--font-heading);
-    letter-spacing: 0.02em;
-    opacity: 0.95;
+    font-size: 11px;
+    color: var(--accent);
+    font-style: normal;
+    font-weight: 800;
+    margin-bottom: 14px;
+    font-family: var(--font-ui);
+    letter-spacing: 0.13em;
+    opacity: 1;
 }
 /* ════════════════════════════════════════════════════════════════════
    v9.5 — Reset button, sticky surah title, confirm dialog

@@ -9,6 +9,17 @@
 
 const FEATURES_KEY = 'quranFeaturesV1';
 
+// Per-section tutorial video links — replace placeholder URLs with specific videos when ready
+const HELP_VIDEOS = {
+    display:  'https://www.youtube.com/@islampaixducoeur',
+    reading:  'https://www.youtube.com/@islampaixducoeur',
+    search:   'https://www.youtube.com/@islampaixducoeur',
+    study:    'https://www.youtube.com/@islampaixducoeur',
+    audio:    'https://www.youtube.com/@islampaixducoeur',
+    advanced: 'https://www.youtube.com/@islampaixducoeur',
+    privacy:  'https://www.youtube.com/@islampaixducoeur',
+};
+
 // Default feature flags (user can toggle in settings)
 const DEFAULT_FEATURES = {
     // v10.9: Off by default — user can opt in
@@ -467,6 +478,7 @@ document.addEventListener('click', function(e) {
         var isDesktop = t.id === 'search-input';
         var isMobile  = t.tagName === 'INPUT' && t.closest && t.closest('.mob-search-row');
         if (!isDesktop && !isMobile) return;
+        if (isMobile) return; // mobile uses the ↵ button — live search causes focus loss
 
         var term = t.value.trim();
         clearTimeout(timer);
@@ -1234,45 +1246,21 @@ function loadArabicFontChoice() {
 }());
 
 function appendFeaturesUI(body) {
-    var sec = document.createElement('div');
-    sec.className = 'mob-settings-section';
-    var lbl = document.createElement('div');
-    lbl.className = 'mob-settings-lbl';
-    lbl.textContent = 'Features';
-    sec.appendChild(lbl);
-
     var f = getFeatures();
-    var FEATURE_LABELS = {
-        searchAsYouType:    ['⚡ Search as you type',     'Auto-runs search 350ms after you stop typing'],
-        voiceSearch:           ['🎤 Voice search',           'Tap the mic to speak a search query'],
-        lastReadBanner:     ['📍 "Continue reading" banner','Shows previously-read surah at top so you can jump back'],
-        khatmTracker:       ['🎯 Khatm tracker',          'Daily reading heatmap + completion count'],
-        focusMode:          ['🧘 Focus mode',              'Hides everything except verses (key: F)'],
-        autoDarkTheme:      ['🌗 Auto dark theme',         'Switches to Scholar after 7pm, Manuscript before'],
-        browserLangDefault: ['🌐 Browser language default','Picks French/English/Spanish/Arabic from device'],
-        verseNavigation:    ['⇆ Verse navigation buttons', 'Floating prev / next / jump-to-verse buttons'],
-        tafsir:             ['📚 Tafsir (commentary)',      'Tap a verse to read classical commentary · needs internet'],
-        dailyVerse:            ['🌅 Daily verse',            'A contemplative verse shown once per day on open'],
-        dailyVerseNotification:['🔔 Daily verse notification','Schedules a daily notification (best-effort: works only on installed PWA on Android Chrome)'],
-        reflectionPrompts:     ['✍️ Reflection prompts',     'Optional reflection question after finishing a surah'],
-        verseComparison:       ['🔀 Compare tafsirs',         'Adds "Compare all" button in the tafsir modal'],
-        pdfExport:             ['🖨 Print / PDF export',     'Print the current surah with your notes'],
-    };
 
-    Object.keys(FEATURE_LABELS).forEach(function(key) {
-        var labelData = FEATURE_LABELS[key];
+    function makeToggleRow(key, label, sub) {
         var row = document.createElement('label');
         row.className = 'feature-toggle-row';
         var labelWrap = document.createElement('span');
         labelWrap.className = 'feature-toggle-lbl-wrap';
         var span = document.createElement('span');
         span.className = 'feature-toggle-lbl';
-        span.textContent = labelData[0];
-        var sub = document.createElement('span');
-        sub.className = 'feature-toggle-sub';
-        sub.textContent = labelData[1];
+        span.textContent = label;
+        var subEl = document.createElement('span');
+        subEl.className = 'feature-toggle-sub';
+        subEl.textContent = sub;
         labelWrap.appendChild(span);
-        labelWrap.appendChild(sub);
+        labelWrap.appendChild(subEl);
         var swWrap = document.createElement('span');
         swWrap.className = 'feature-toggle-sw';
         var inp = document.createElement('input');
@@ -1282,7 +1270,6 @@ function appendFeaturesUI(body) {
             var current = getFeatures();
             current[key] = this.checked;
             saveFeatures(current);
-            // Re-apply features that need to react
             if (key === 'autoDarkTheme' && this.checked) applyAutoTheme();
             if (key === 'verseNavigation') {
                 if (this.checked) buildVerseNav();
@@ -1296,7 +1283,6 @@ function appendFeaturesUI(body) {
             if (key === 'tafsir' && !this.checked) {
                 if (typeof closeTafsirModal === 'function') closeTafsirModal();
             }
-            // v10.7 reactive toggles
             if (key === 'hijriAwareness') {
                 var existing = document.querySelector('.hijri-badge');
                 if (existing) existing.remove();
@@ -1331,15 +1317,176 @@ function appendFeaturesUI(body) {
         swWrap.appendChild(slider);
         row.appendChild(labelWrap);
         row.appendChild(swWrap);
-        sec.appendChild(row);
+        return row;
+    }
+
+    function makeSection(title, helpKey) {
+        var sec = document.createElement('div');
+        sec.className = 'mob-settings-section';
+        var lbl = document.createElement('div');
+        lbl.className = 'mob-settings-lbl';
+        var titleSpan = document.createElement('span');
+        titleSpan.textContent = title;
+        lbl.appendChild(titleSpan);
+        var helpUrl = helpKey && HELP_VIDEOS[helpKey];
+        if (helpUrl) {
+            var helpBtn = document.createElement('button');
+            helpBtn.className = 'section-help-btn';
+            helpBtn.title = 'Watch tutorial on YouTube';
+            helpBtn.textContent = 'ℹ️';
+            helpBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                window.open(helpUrl, '_blank');
+            });
+            lbl.appendChild(helpBtn);
+        }
+        sec.appendChild(lbl);
+        return sec;
+    }
+
+    // 📖 Reading
+    var readSec = makeSection('📖 Reading', 'reading');
+
+    // Notification card — prominent, first in Reading
+    var notifLabel = document.createElement('div');
+    notifLabel.className = 'notif-settings-section-label';
+    notifLabel.textContent = 'Notifications';
+    readSec.appendChild(notifLabel);
+
+    var isNotifOn = !!f['dailyVerseNotification'];
+    var savedHour = 8;
+    try { var _sh = localStorage.getItem(PUSH_NOTIF_HOUR_KEY); if (_sh !== null) savedHour = parseInt(_sh); } catch(e) {}
+    function _fmtHour(h) { var p = h >= 12 ? 'PM' : 'AM'; return (h % 12 || 12) + ':00 ' + p; }
+
+    var notifCard = document.createElement('div');
+    notifCard.className = 'notif-settings-card' + (isNotifOn ? '' : ' notif-off');
+
+    var notifTop = document.createElement('div');
+    notifTop.className = 'notif-settings-card-top';
+    var notifTitle = document.createElement('div');
+    notifTitle.className = 'notif-settings-card-title';
+    notifTitle.textContent = '🔔 Daily verse notification';
+    var notifSwWrap = document.createElement('span');
+    notifSwWrap.className = 'feature-toggle-sw';
+    var notifInp = document.createElement('input');
+    notifInp.type = 'checkbox';
+    notifInp.checked = isNotifOn;
+    var notifSlider = document.createElement('span');
+    notifSlider.className = 'feature-toggle-slider';
+    notifSwWrap.appendChild(notifInp);
+    notifSwWrap.appendChild(notifSlider);
+    notifTop.appendChild(notifTitle);
+    notifTop.appendChild(notifSwWrap);
+    notifCard.appendChild(notifTop);
+
+    var notifTimeRow = document.createElement('div');
+    notifTimeRow.className = 'notif-settings-time-row';
+    notifTimeRow.style.display = isNotifOn ? '' : 'none';
+    var notifTimeLbl = document.createElement('div');
+    notifTimeLbl.className = 'notif-settings-time-lbl';
+    notifTimeLbl.textContent = '⏰ Time of notification';
+    var notifTimeChip = document.createElement('div');
+    notifTimeChip.className = 'notif-settings-time-chip';
+    var notifTimeVal = document.createElement('span');
+    notifTimeVal.textContent = _fmtHour(savedHour);
+    notifTimeChip.appendChild(notifTimeVal);
+    notifTimeChip.insertAdjacentHTML('beforeend', ' <span style="font-size:10px;opacity:0.6">✏️</span>');
+    notifTimeChip.addEventListener('click', function() {
+        showNotifTimePicker(function(newHour) {
+            notifTimeVal.textContent = _fmtHour(newHour);
+            if (typeof doSubscribe === 'function') doSubscribe(newHour);
+            showToast('✓ Notification time updated');
+        });
+    });
+    notifTimeRow.appendChild(notifTimeLbl);
+    notifTimeRow.appendChild(notifTimeChip);
+    notifCard.appendChild(notifTimeRow);
+
+    notifInp.addEventListener('change', function() {
+        var current = getFeatures();
+        current['dailyVerseNotification'] = this.checked;
+        saveFeatures(current);
+        notifCard.classList.toggle('notif-off', !this.checked);
+        notifTimeRow.style.display = this.checked ? '' : 'none';
+        if (this.checked) {
+            setupDailyVerseNotification(false);
+        } else {
+            teardownDailyVerseNotification();
+        }
+        track('feature_toggled', { feature: 'dailyVerseNotification', state: this.checked ? 'on' : 'off' });
+        hapticTap(10);
     });
 
-    // Arabic font picker — always shown
+    readSec.appendChild(notifCard);
+
+    var notifDivider = document.createElement('div');
+    notifDivider.className = 'notif-settings-divider';
+    readSec.appendChild(notifDivider);
+
+    readSec.appendChild(makeToggleRow('lastReadBanner',  '📍 "Continue reading" banner', 'Shows previously-read surah at top so you can jump back'));
+    readSec.appendChild(makeToggleRow('verseNavigation', '⇆ Verse navigation buttons',   'Floating prev / next / jump-to-verse buttons'));
+    readSec.appendChild(makeToggleRow('dailyVerse',      '🌅 Daily verse',                'A contemplative verse shown once per day on open'));
+    readSec.appendChild(makeToggleRow('focusMode',       '🧘 Focus mode',                 'Hides everything except verses (key: F)'));
+    body.appendChild(readSec);
+
+    // 🔍 Search
+    var searchSec = makeSection('🔍 Search', 'search');
+    if (window.innerWidth > 900) {
+        searchSec.appendChild(makeToggleRow('searchAsYouType', '⚡ Search as you type', 'Auto-runs search 350ms after you stop typing'));
+    }
+    searchSec.appendChild(makeToggleRow('voiceSearch',     '🎤 Voice search',       'Tap the mic to speak a search query'));
+    body.appendChild(searchSec);
+
+    // 📚 Study
+    var studySec = makeSection('📚 Study', 'study');
+    studySec.appendChild(makeToggleRow('tafsir',            '📚 Tafsir (commentary)',  'Tap a verse to read classical commentary · needs internet'));
+    studySec.appendChild(makeToggleRow('verseComparison',   '🔀 Compare tafsirs',      'Adds "Compare all" button in the tafsir modal'));
+    studySec.appendChild(makeToggleRow('reflectionPrompts', '✍️ Reflection prompts',   'Optional reflection question after finishing a surah'));
+    studySec.appendChild(makeToggleRow('khatmTracker',      '🎯 Khatm tracker',        'Daily reading heatmap + completion count'));
+    body.appendChild(studySec);
+
+    // ▸ Advanced (collapsed by default)
+    var advSec = document.createElement('div');
+    advSec.className = 'mob-settings-section';
+    var advHeader = document.createElement('div');
+    advHeader.className = 'settings-collapsible-header';
+    var advTitle = document.createElement('div');
+    advTitle.className = 'mob-settings-lbl';
+    var advTitleSpan = document.createElement('span');
+    advTitleSpan.textContent = '⚙ Advanced';
+    advTitle.appendChild(advTitleSpan);
+    if (HELP_VIDEOS.advanced) {
+        var advHelpBtn = document.createElement('button');
+        advHelpBtn.className = 'section-help-btn';
+        advHelpBtn.title = 'Watch tutorial on YouTube';
+        advHelpBtn.textContent = 'ℹ️';
+        advHelpBtn.addEventListener('click', function(e) { e.stopPropagation(); window.open(HELP_VIDEOS.advanced, '_blank'); });
+        advTitle.appendChild(advHelpBtn);
+    }
+    var advArrow = document.createElement('span');
+    advArrow.className = 'settings-collapsible-arrow';
+    advArrow.textContent = '▾';
+    advHeader.appendChild(advTitle);
+    advHeader.appendChild(advArrow);
+    var advContent = document.createElement('div');
+    advContent.className = 'settings-collapsible-content';
+    advContent.style.display = 'none';
+    advHeader.addEventListener('click', function() {
+        var isOpen = advContent.style.display !== 'none';
+        advContent.style.display = isOpen ? 'none' : '';
+        advArrow.textContent = isOpen ? '▾' : '▴';
+    });
+
+    advContent.appendChild(makeToggleRow('autoDarkTheme',      '🌗 Auto dark theme',         'Switches to Scholar after 7pm, Manuscript before'));
+    advContent.appendChild(makeToggleRow('browserLangDefault', '🌐 Browser language default', 'Picks French/English/Spanish/Arabic from device'));
+    advContent.appendChild(makeToggleRow('pdfExport',          '🖨 Print / PDF export',       'Print the current surah with your notes'));
+
+    // Arabic font picker (inside Advanced)
     var fontSec = document.createElement('div');
     fontSec.className = 'feature-sub-row';
     var fontLbl = document.createElement('div');
     fontLbl.className = 'feature-sub-lbl';
-    fontLbl.textContent = 'Arabic font';
+    fontLbl.textContent = '🔤 Arabic font';
     fontSec.appendChild(fontLbl);
     var fontSel = document.createElement('select');
     fontSel.className = 'mob-settings-select';
@@ -1355,25 +1502,16 @@ function appendFeaturesUI(body) {
         applyArabicFont(this.value);
     });
     fontSec.appendChild(fontSel);
-    sec.appendChild(fontSec);
+    advContent.appendChild(fontSec);
 
-    // v11: Analytics opt-out toggle (shown after features list)
-    var analyticsSec = document.createElement('div');
-    analyticsSec.className = 'mob-settings-section';
-    var analyticsLbl = document.createElement('div');
-    analyticsLbl.className = 'mob-settings-lbl';
-    analyticsLbl.textContent = 'Privacy';
-    analyticsSec.appendChild(analyticsLbl);
-
+    // Analytics toggle (inside Advanced — inverted logic: toggle ON = tracking ON)
     var analyticsDescriptions = {
-        arabic:  'مشاركة إحصاءات الاستخدام المجهولة لتحسين التطبيق (لا بيانات شخصية، لا محتوى قرآني)',
-        french:  'Partager des statistiques d\'utilisation anonymes pour améliorer l\'application (sans données personnelles ni contenu coranique)',
-        english: 'Share anonymous usage stats to help improve the app (no personal data, no verse content)',
-        spanish: 'Compartir estadísticas de uso anónimas para mejorar la aplicación (sin datos personales ni contenido coránico)'
+        arabic:  'مشاركة إحصاءات الاستخدام المجهولة لتحسين التطبيق (لا بيانات شخصية)',
+        french:  'Partager des statistiques d\'utilisation anonymes pour améliorer l\'application (sans données personnelles)',
+        english: 'Share anonymous usage stats to help improve the app (no personal data)',
+        spanish: 'Compartir estadísticas de uso anónimas para mejorar la aplicación (sin datos personales)'
     };
     var lang = (typeof currentLanguage !== 'undefined') ? currentLanguage : 'english';
-    var analyticsDesc = analyticsDescriptions[lang] || analyticsDescriptions.english;
-
     var analyticsRow = document.createElement('label');
     analyticsRow.className = 'feature-toggle-row';
     var analyticsLblWrap = document.createElement('span');
@@ -1383,17 +1521,17 @@ function appendFeaturesUI(body) {
     analyticsSpan.textContent = '📊 Anonymous usage stats';
     var analyticsSub = document.createElement('span');
     analyticsSub.className = 'feature-toggle-sub';
-    analyticsSub.textContent = analyticsDesc;
+    analyticsSub.textContent = analyticsDescriptions[lang] || analyticsDescriptions.english;
     analyticsLblWrap.appendChild(analyticsSpan);
     analyticsLblWrap.appendChild(analyticsSub);
     var analyticsSwWrap = document.createElement('span');
     analyticsSwWrap.className = 'feature-toggle-sw';
     var analyticsInp = document.createElement('input');
     analyticsInp.type = 'checkbox';
-    analyticsInp.checked = !isFeatureOn('analyticsOptOut'); // toggle is ON = tracking ON
+    analyticsInp.checked = !isFeatureOn('analyticsOptOut');
     analyticsInp.addEventListener('change', function() {
         var current = getFeatures();
-        current.analyticsOptOut = !this.checked; // toggle OFF = opt out
+        current.analyticsOptOut = !this.checked;
         saveFeatures(current);
         showToast(this.checked ? '✓ Usage stats ON' : '✗ Usage stats OFF');
         hapticTap(10);
@@ -1404,30 +1542,64 @@ function appendFeaturesUI(body) {
     analyticsSwWrap.appendChild(analyticsSlider);
     analyticsRow.appendChild(analyticsLblWrap);
     analyticsRow.appendChild(analyticsSwWrap);
-    analyticsSec.appendChild(analyticsRow);
+    advContent.appendChild(analyticsRow);
 
-    body.appendChild(sec);
-    body.appendChild(analyticsSec);
+    advSec.appendChild(advHeader);
+    advSec.appendChild(advContent);
+    advSec.setAttribute('data-adv-section', '1');
+    body.appendChild(advSec);
+    // Note: finalSettingsCleanup moves this to just before Data & Privacy
 }
 
 function appendDataUI(body) {
-    var sec = document.createElement('div');
-    sec.className = 'mob-settings-section';
-    var lbl = document.createElement('div');
-    lbl.className = 'mob-settings-lbl';
-    lbl.textContent = 'Export notes & data';
-    sec.appendChild(lbl);
+    // Move Advanced section to sit immediately before Data & Privacy
+    var advEl = body.querySelector('[data-adv-section]');
+    if (advEl) body.appendChild(advEl);
+
+    var outerSec = document.createElement('div');
+    outerSec.className = 'mob-settings-section';
+
+    var header = document.createElement('div');
+    header.className = 'settings-collapsible-header';
+    var headerTitle = document.createElement('div');
+    headerTitle.className = 'mob-settings-lbl';
+    var headerTitleSpan = document.createElement('span');
+    headerTitleSpan.textContent = '🔒 Data & Privacy';
+    headerTitle.appendChild(headerTitleSpan);
+    if (HELP_VIDEOS.privacy) {
+        var privHelpBtn = document.createElement('button');
+        privHelpBtn.className = 'section-help-btn';
+        privHelpBtn.title = 'Watch tutorial on YouTube';
+        privHelpBtn.textContent = 'ℹ️';
+        privHelpBtn.addEventListener('click', function(e) { e.stopPropagation(); window.open(HELP_VIDEOS.privacy, '_blank'); });
+        headerTitle.appendChild(privHelpBtn);
+    }
+    var headerArrow = document.createElement('span');
+    headerArrow.className = 'settings-collapsible-arrow';
+    headerArrow.textContent = '▾';
+    header.appendChild(headerTitle);
+    header.appendChild(headerArrow);
+
+    var content = document.createElement('div');
+    content.className = 'settings-collapsible-content';
+    content.style.display = 'none';
+
+    header.addEventListener('click', function() {
+        var isOpen = content.style.display !== 'none';
+        content.style.display = isOpen ? 'none' : '';
+        headerArrow.textContent = isOpen ? '▾' : '▴';
+    });
 
     var hint = document.createElement('div');
     hint.style.cssText = 'font-size:12px;color:var(--text-secondary);margin-bottom:8px;opacity:0.85;line-height:1.4;';
     hint.textContent = 'Saves all your notes, bookmarks, highlights, and reading history as a JSON file.';
-    sec.appendChild(hint);
+    content.appendChild(hint);
 
     var exp = document.createElement('button');
     exp.className = 'mob-settings-btn';
     exp.textContent = '💾 Export notes & bookmarks (JSON)';
     exp.addEventListener('click', exportAllData);
-    sec.appendChild(exp);
+    content.appendChild(exp);
 
     var impLbl = document.createElement('label');
     impLbl.className = 'mob-settings-btn';
@@ -1442,9 +1614,11 @@ function appendDataUI(body) {
         if (this.files && this.files[0]) importAllData(this.files[0]);
     });
     impLbl.appendChild(impInp);
-    sec.appendChild(impLbl);
+    content.appendChild(impLbl);
 
-    body.appendChild(sec);
+    outerSec.appendChild(header);
+    outerSec.appendChild(content);
+    body.appendChild(outerSec);
 }
 
 function appendFocusModeButton(body) {
@@ -1681,7 +1855,7 @@ window.openFeaturesModal = function() {
     if (typeof appendFeaturesUI      === 'function') appendFeaturesUI(body);
     if (typeof appendFocusModeButton === 'function') appendFocusModeButton(body);
     if (typeof appendKhatmUI         === 'function') appendKhatmUI(body);
-    // v10.10: appendDataUI moved to final injection layer (always last)
+    // Version footer and section reordering handled by finalSettingsCleanup (last injection)
     overlay.classList.add('show');
 };
 
@@ -2527,8 +2701,10 @@ window.updateInstallPill = function() {
 
 // ── Install card in settings ──
 function appendInstallUI(body) {
+    if (body.querySelector('[data-install-section]')) return;
     var sec = document.createElement('div');
     sec.className = 'mob-settings-section';
+    sec.setAttribute('data-install-section', '1');
     var lbl = document.createElement('div');
     lbl.className = 'mob-settings-lbl';
     lbl.textContent = 'Install as app';
@@ -2542,7 +2718,8 @@ function appendInstallUI(body) {
                        window.navigator.standalone === true;
 
     if (isStandalone) {
-        hint.textContent = '✓ App is installed and running in standalone mode. Reading also works offline once you\'ve loaded each language at least once.';
+        hint.style.cssText = 'font-size:24px;font-weight:700;color:#4caf50;text-align:center;padding:14px 0 4px;line-height:1.3;';
+        hint.textContent = '✅ Installed — works offline';
         sec.appendChild(hint);
     } else if (window._pwaInstallable) {
         hint.textContent = 'Install this app on your device for an icon on your home screen, faster startup, and full offline reading.';
@@ -3049,7 +3226,17 @@ function appendAudioUI(body) {
     sec.className = 'mob-settings-section';
     var lbl = document.createElement('div');
     lbl.className = 'mob-settings-lbl';
-    lbl.textContent = 'Audio recitation';
+    var audioLblSpan = document.createElement('span');
+    audioLblSpan.textContent = '🎵 Audio recitation';
+    lbl.appendChild(audioLblSpan);
+    if (HELP_VIDEOS.audio) {
+        var audioHelpBtn = document.createElement('button');
+        audioHelpBtn.className = 'section-help-btn';
+        audioHelpBtn.title = 'Watch tutorial on YouTube';
+        audioHelpBtn.textContent = 'ℹ️';
+        audioHelpBtn.addEventListener('click', function(e) { e.stopPropagation(); window.open(HELP_VIDEOS.audio, '_blank'); });
+        lbl.appendChild(audioHelpBtn);
+    }
     sec.appendChild(lbl);
 
     var prefs = getAudioPrefs();
@@ -3802,13 +3989,22 @@ function openTopicVerses(topicIdx) {
             if (typeof displaySingleSura === 'function') {
                 displaySingleSura(sura.id);
                 setTimeout(function() {
-                    var verses = document.querySelectorAll('.sura .verse');
-                    if (verses[vNum - 1]) {
-                        verses[vNum - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        verses[vNum - 1].classList.add('verse-flash');
-                        setTimeout(function(){ verses[vNum - 1].classList.remove('verse-flash'); }, 1500);
-                    }
-                }, 300);
+                    var container = document.getElementById('quranContainer');
+                    var verses = container ? container.querySelectorAll('.verse') : [];
+                    var target = verses[vNum - 1];
+                    if (!target || !container) return;
+                    // Scroll so the verse appears just below the sticky surah header,
+                    // matching the normal reading experience.
+                    var stickyEl = container.querySelector('.sura-sticky-title');
+                    var stickyH = stickyEl ? stickyEl.offsetHeight : 52;
+                    // Sum offsetTop values up to the container
+                    var top = 0;
+                    var el = target;
+                    while (el && el !== container) { top += el.offsetTop; el = el.offsetParent; }
+                    container.scrollTop = top - stickyH - 16;
+                    target.classList.add('verse-flash');
+                    setTimeout(function(){ target.classList.remove('verse-flash'); }, 1500);
+                }, 350);
             }
         });
         list.appendChild(card);
@@ -4115,8 +4311,24 @@ function openReflectionModal(suraId) {
 // ──────────────────────────────────────────────────────────────────
 // FEATURE 7: HIJRI CALENDAR AWARENESS
 // ──────────────────────────────────────────────────────────────────
-// Simple Umm al-Qura-style conversion (approximation, ±1 day)
+// Uses the browser's Intl API with the Umm al-Qura calendar (the
+// official Islamic calendar reference). Falls back to the arithmetic
+// approximation on very old browsers.
 function gregorianToHijri(g) {
+    try {
+        var fmt = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', {
+            day: 'numeric', month: 'numeric', year: 'numeric'
+        });
+        var parts = fmt.formatToParts(g);
+        var d = {};
+        parts.forEach(function(p) {
+            if (p.type === 'day')   d.day   = parseInt(p.value, 10);
+            if (p.type === 'month') d.month = parseInt(p.value, 10);
+            if (p.type === 'year')  d.year  = parseInt(p.value, 10);
+        });
+        if (d.day && d.month && d.year) return d;
+    } catch(e) {}
+    // Arithmetic fallback (±1-2 day approximation)
     var jd = Math.floor((g.getTime() / 86400000) + 2440587.5);
     var l = jd - 1948440 + 10632;
     var n = Math.floor((l - 1) / 10631);
@@ -4888,18 +5100,89 @@ function refreshTopReadingTime() {
 }());
 
 // ════════════════════════════════════════════════════════════════════
-// v10.10 — Daily verse notification (best-effort)
-// (a) When toggled ON, request permission
-// (b) If installed PWA + Notification Triggers API available (Chrome
-//     Android), schedule a notification for tomorrow 8am
-// (c) Always fall back to "show on next open" — handled by maybeShowDailyVerse
+// v10.13 — Daily verse notification via Web Push
 // ════════════════════════════════════════════════════════════════════
-const DAILY_NOTIF_LAST_SCHEDULED = 'quranDailyNotifLastScheduled';
+var PUSH_SERVER_URL  = 'https://quran-push-server-production.up.railway.app';
+var VAPID_PUBLIC_KEY = 'BFZJh92I-qypfw2ZKsJoBbD0IwN7O13EBvFWE_GIVGbtQSfMrnxNR5Re3DP-Ex1uQdF-xtiKXD-ijbocrYzTleE';
+var PUSH_NOTIF_HOUR_KEY = 'quranNotifHour';
 
-async function setupDailyVerseNotification() {
+function urlBase64ToUint8Array(base64String) {
+    var padding = '='.repeat((4 - base64String.length % 4) % 4);
+    var base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    var rawData = atob(base64);
+    var output = new Uint8Array(rawData.length);
+    for (var i = 0; i < rawData.length; i++) { output[i] = rawData.charCodeAt(i); }
+    return output;
+}
+
+function showNotifTimePicker(onConfirm, onCancel) {
+    var savedHour = 8;
+    try { savedHour = parseInt(localStorage.getItem(PUSH_NOTIF_HOUR_KEY) || '8'); } catch(e) {}
+    var pad = function(n) { return n < 10 ? '0' + n : '' + n; };
+    var defaultVal = pad(savedHour) + ':00';
+    var tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+
+    var overlay = document.createElement('div');
+    overlay.className = 'notif-time-overlay';
+    overlay.innerHTML =
+        '<div class="notif-time-card">' +
+            '<h3>🔔 Daily notification time</h3>' +
+            '<p>Choose when you\'d like to receive your daily Quran verse.' +
+            (tz ? '<br><small>Your timezone: ' + tz + '</small>' : '') + '</p>' +
+            '<input class="notif-time-input" type="time" value="' + defaultVal + '" />' +
+            '<div class="notif-time-actions">' +
+                '<button class="btn-cancel">Cancel</button>' +
+                '<button class="btn-confirm">Confirm</button>' +
+            '</div>' +
+        '</div>';
+
+    document.body.appendChild(overlay);
+
+    overlay.querySelector('.btn-cancel').addEventListener('click', function() {
+        document.body.removeChild(overlay);
+        if (onCancel) onCancel();
+    });
+
+    overlay.querySelector('.btn-confirm').addEventListener('click', function() {
+        var val = overlay.querySelector('.notif-time-input').value || '08:00';
+        var hour = parseInt(val.split(':')[0]);
+        try { localStorage.setItem(PUSH_NOTIF_HOUR_KEY, String(hour)); } catch(e) {}
+        document.body.removeChild(overlay);
+        if (onConfirm) onConfirm(hour);
+    });
+}
+
+async function doSubscribe(notifHour) {
+    var tzOffset = new Date().getTimezoneOffset();
+    var reg = await navigator.serviceWorker.ready;
+    var existing = await reg.pushManager.getSubscription();
+    if (existing) {
+        // Update hour on server even if already subscribed
+        var payload = Object.assign(JSON.parse(JSON.stringify(existing)), { notifHour: notifHour, tzOffset: tzOffset });
+        await fetch(PUSH_SERVER_URL + '/subscribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        return true;
+    }
+    var subscription = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+    });
+    var payload = Object.assign(JSON.parse(JSON.stringify(subscription)), { notifHour: notifHour, tzOffset: tzOffset });
+    await fetch(PUSH_SERVER_URL + '/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+    return true;
+}
+
+async function setupDailyVerseNotification(skipPicker) {
     if (!isFeatureOn('dailyVerseNotification')) return;
-    if (!('Notification' in window)) {
-        if (typeof showToast === 'function') showToast('Notifications not supported on this browser');
+    if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+        if (typeof showToast === 'function') showToast('Push notifications not supported on this browser');
         return false;
     }
     if (Notification.permission === 'denied') {
@@ -4913,73 +5196,68 @@ async function setupDailyVerseNotification() {
                 if (typeof showToast === 'function') showToast('Notifications denied');
                 return false;
             }
+        } catch(e) { return false; }
+    }
+
+    var savedHour = null;
+    try { var s = localStorage.getItem(PUSH_NOTIF_HOUR_KEY); if (s !== null) savedHour = parseInt(s); } catch(e) {}
+
+    if (!skipPicker && savedHour === null) {
+        showNotifTimePicker(async function(hour) {
+            try {
+                await doSubscribe(hour);
+                var pad = function(n) { return n < 10 ? '0' + n : '' + n; };
+                if (typeof showToast === 'function') showToast('Notifications set for ' + pad(hour) + ':00 every day');
+            } catch(err) {
+                console.warn('[Notif] subscription failed', err);
+                if (typeof showToast === 'function') showToast('Could not enable notifications');
+            }
+        }, function() {
+            // User cancelled — turn the feature back off
+            var f = getFeatures(); f.dailyVerseNotification = false; saveFeatures(f);
+        });
+    } else {
+        var hour = savedHour !== null ? savedHour : 8;
+        try {
+            await doSubscribe(hour);
+            if (!skipPicker) {
+                var pad = function(n) { return n < 10 ? '0' + n : '' + n; };
+                if (typeof showToast === 'function') showToast('Notifications set for ' + pad(hour) + ':00 every day');
+            }
         } catch(e) {
-            return false;
+            console.warn('[Notif] subscription failed', e);
+            if (typeof showToast === 'function') showToast('Could not enable notifications');
         }
     }
-    // Schedule for tomorrow 8 AM (or 8 AM today if it's before 8 AM)
-    await scheduleNextDailyNotification();
     return true;
 }
 
-async function scheduleNextDailyNotification() {
+async function teardownDailyVerseNotification() {
     try {
         if (!('serviceWorker' in navigator)) return;
         var reg = await navigator.serviceWorker.ready;
-        // Check for Notification Triggers API support (experimental, Chrome Android)
-        if (!('showTrigger' in Notification.prototype) && !('TimestampTrigger' in window)) {
-            // Browser doesn't support scheduled notifications — we'll rely on the
-            // "show on next open" fallback (which works via maybeShowDailyVerse).
-            return;
-        }
-        // Compute next 8 AM
-        var now = new Date();
-        var target = new Date();
-        target.setHours(8, 0, 0, 0);
-        if (target.getTime() <= now.getTime()) {
-            target.setDate(target.getDate() + 1);
-        }
-        // Don't reschedule if we already scheduled for this exact time
-        var lastScheduled = null;
-        try { lastScheduled = parseInt(localStorage.getItem(DAILY_NOTIF_LAST_SCHEDULED) || '0'); } catch(e) {}
-        if (lastScheduled === target.getTime()) return;
-        try {
-            var TT = window.TimestampTrigger;
-            await reg.showNotification('🌅 Today\'s verse', {
-                body: 'Your daily Quran reflection is waiting.',
-                icon: 'img/icon-192.png',
-                badge: 'img/icon-192.png',
-                tag: 'daily-verse',
-                showTrigger: TT ? new TT(target.getTime()) : undefined
-            });
-            localStorage.setItem(DAILY_NOTIF_LAST_SCHEDULED, String(target.getTime()));
-        } catch(err) {
-            console.warn('[Notif] scheduling failed', err);
-        }
+        var subscription = await reg.pushManager.getSubscription();
+        if (!subscription) return;
+        await fetch(PUSH_SERVER_URL + '/unsubscribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ endpoint: subscription.endpoint })
+        });
+        await subscription.unsubscribe();
+        try { localStorage.removeItem(PUSH_NOTIF_HOUR_KEY); } catch(e) {}
     } catch(e) {
-        console.warn('[Notif] setup error', e);
+        console.warn('[Notif] unsubscribe failed', e);
     }
 }
 
-// When the feature toggle flips ON, request permission and schedule
-(function reactiveNotifToggle() {
-    document.addEventListener('change', function(e) {
-        if (!e.target || e.target.type !== 'checkbox') return;
-        if (!e.target.closest('.feature-toggle-row')) return;
-        // Detect which feature changed
-        setTimeout(function() {
-            if (isFeatureOn('dailyVerseNotification') && Notification && Notification.permission !== 'granted') {
-                setupDailyVerseNotification();
-            }
-        }, 100);
-    });
-}());
+// Note: subscribe/unsubscribe on toggle is handled directly by the
+// notifInp change listener in the notification card (appendFeaturesUI).
 
-// On app load, if the feature is on, try to (re)schedule
+// On app load, if the feature is on and permission granted, ensure subscribed (skip picker)
 (function notifInitOnLoad() {
     function init() {
         if (isFeatureOn('dailyVerseNotification') && 'Notification' in window && Notification.permission === 'granted') {
-            scheduleNextDailyNotification();
+            setupDailyVerseNotification(true);
         }
     }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
@@ -5574,7 +5852,7 @@ function openHelpModal() {
 // surah (key = 0-indexed surah ID as a string, "0" = Al-Fatiha, etc.)
 // Surahs with no entry simply show no video section.
 // ════════════════════════════════════════════════════════════════════
-const YT_CHANNEL_URL = 'https://www.youtube.com/@VotreChaine'; // ← replace with your channel URL
+const YT_CHANNEL_URL = 'https://www.youtube.com/@islampaixducoeur';
 var _ytFrData = null;
 
 function loadYtFrData(cb) {
@@ -5679,6 +5957,58 @@ function appendYtChannelUI(body) {
     }
     if (!tryInject()) {
         var iv = setInterval(function() { if (tryInject()) clearInterval(iv); }, 200);
+    }
+}());
+
+// ════════════════════════════════════════════════════════════════════
+// v10.14 — Final settings cleanup: reorders Install + version footer
+// ════════════════════════════════════════════════════════════════════
+(function finalSettingsCleanup() {
+    function reorder(body) {
+        if (!body) return;
+
+        // Move Install as app to right after the meditation banner
+        var installSec = body.querySelector('[data-install-section]');
+        var medBanner  = body.querySelector('.settings-meditation');
+        if (installSec && medBanner && medBanner.nextSibling !== installSec) {
+            body.insertBefore(installSec, medBanner.nextSibling);
+        }
+
+        // Ensure version footer is the last child and always shows the current version
+        var vEl = body.querySelector('.app-version-footer') || body.querySelector('.mob-settings-version');
+        if (!vEl) {
+            vEl = document.createElement('div');
+            vEl.className = 'app-version-footer';
+        }
+        vEl.textContent = 'Quran Display v10.18';
+        body.appendChild(vEl);
+    }
+
+    function tryCleanup() {
+        if (typeof buildSheetSettings === 'undefined') return false;
+        if (window._finalCleanupInjected) return true;
+        window._finalCleanupInjected = true;
+
+        var origSheet = buildSheetSettings;
+        window.buildSheetSettings = buildSheetSettings = function(body, title) {
+            origSheet(body, title);
+            setTimeout(function() { reorder(body); }, 250);
+        };
+
+        if (typeof openFeaturesModal === 'function') {
+            var origModal = openFeaturesModal;
+            window.openFeaturesModal = function() {
+                origModal();
+                setTimeout(function() {
+                    reorder(document.getElementById('featuresModalBody'));
+                }, 250);
+            };
+        }
+        return true;
+    }
+
+    if (!tryCleanup()) {
+        var iv = setInterval(function() { if (tryCleanup()) clearInterval(iv); }, 200);
     }
 }());
 
