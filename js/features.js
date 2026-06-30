@@ -1290,6 +1290,14 @@ function appendFeaturesUI(body) {
                     setTimeout(appendHijriBadge, 100);
                 }
             }
+            if (key === 'khatmTracker') {
+                if (this.checked) {
+                    if (window.innerWidth > 767) appendKhatmUI(body);
+                } else {
+                    var kSec = body.querySelector('[data-khatm-section]');
+                    if (kSec) kSec.remove();
+                }
+            }
             if (key === 'voiceSearch') {
                 if (this.checked && typeof attachVoiceSearchButton === 'function') {
                     ['search-input', 'mob-search-input'].forEach(function(id) {
@@ -1357,8 +1365,7 @@ function appendFeaturesUI(body) {
     var savedHour = 8, savedMinute = 0;
     try { var _sh = localStorage.getItem(PUSH_NOTIF_HOUR_KEY); if (_sh !== null) savedHour = parseInt(_sh); } catch(e) {}
     try { var _sm = localStorage.getItem(PUSH_NOTIF_MIN_KEY);  if (_sm !== null) savedMinute = parseInt(_sm); } catch(e) {}
-    var _pad = function(n) { return n < 10 ? '0' + n : '' + n; };
-    function _fmtTime(h, m) { var p = h >= 12 ? 'PM' : 'AM'; return (h % 12 || 12) + ':' + _pad(m) + ' ' + p; }
+    var _fmtTime = fmtNotifTime;
 
     var notifCard = document.createElement('div');
     notifCard.className = 'notif-settings-card' + (isNotifOn ? '' : ' notif-off');
@@ -1390,6 +1397,7 @@ function appendFeaturesUI(body) {
     var notifTimeChip = document.createElement('div');
     notifTimeChip.className = 'notif-settings-time-chip';
     var notifTimeVal = document.createElement('span');
+    notifTimeVal.id = 'notifTimeValEl';
     notifTimeVal.textContent = _fmtTime(savedHour, savedMinute);
     notifTimeChip.appendChild(notifTimeVal);
     notifTimeChip.insertAdjacentHTML('beforeend', ' <span style="font-size:10px;opacity:0.6">✏️</span>');
@@ -1658,8 +1666,10 @@ function appendFocusModeButton(body) {
 
 function appendKhatmUI(body) {
     if (!isFeatureOn('khatmTracker')) return;
+    if (body.querySelector('[data-khatm-section]')) return;
     var sec = document.createElement('div');
     sec.className = 'mob-settings-section';
+    sec.setAttribute('data-khatm-section', '1');
     var lbl = document.createElement('div');
     lbl.className = 'mob-settings-lbl';
     lbl.textContent = 'Khatm tracker';
@@ -2273,12 +2283,9 @@ function appendReadingPlanUI(body) {
                     if (pill) pill.remove();
                     var modal = document.getElementById('readingPlanModal');
                     if (modal) modal.remove();
-                    // Clear session-dismissed flag so a future plan shows the pill again
                     try { sessionStorage.removeItem('readingPlanPillDismissed'); } catch(e) {}
                     showToast('Plan cancelled');
-                    if (typeof openFeaturesModal === 'function' && document.getElementById('featuresModal').classList.contains('show')) {
-                        openFeaturesModal();
-                    }
+                    refreshSettingsUI();
                 });
             } else if (confirm('Cancel reading plan? Your progress will be lost.')) {
                 clearReadingPlan();
@@ -2354,10 +2361,7 @@ function appendReadingPlanUI(body) {
                 _readingTimeStart = Date.now();
                 if (typeof refreshTopReadingTime === 'function') refreshTopReadingTime();
                 if (typeof showToast === 'function') showToast('Reading time reset');
-                var feat = document.getElementById('featuresModal');
-                if (feat && feat.classList.contains('show') && typeof openFeaturesModal === 'function') {
-                    openFeaturesModal();
-                }
+                refreshSettingsUI();
             });
         } else if (confirm(msg)) {
             try { localStorage.removeItem(READING_TIME_KEY); } catch(e) {}
@@ -2409,11 +2413,7 @@ function startPlan(planType, customDays) {
     saveReadingPlan(plan);
     showToast('📖 Plan started!');
     renderReadingPlanCard();
-    // Refresh the settings UI if open
-    if (typeof openFeaturesModal === 'function') {
-        var modal = document.getElementById('featuresModal');
-        if (modal && modal.classList.contains('show')) openFeaturesModal();
-    }
+    refreshSettingsUI();
     hapticTap(20);
 }
 
@@ -2718,8 +2718,10 @@ function appendInstallUI(body) {
     // Detect install state
     var isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
                        window.navigator.standalone === true;
+    var wasInstalled = false;
+    try { wasInstalled = localStorage.getItem('quranPWAInstalled') === '1'; } catch(e) {}
 
-    if (isStandalone) {
+    if (isStandalone || wasInstalled) {
         hint.style.cssText = 'font-size:24px;font-weight:700;color:#4caf50;text-align:center;padding:14px 0 4px;line-height:1.3;';
         hint.textContent = '✅ Installed — works offline';
         sec.appendChild(hint);
@@ -5101,6 +5103,22 @@ function refreshTopReadingTime() {
     }
 }());
 
+// Rebuild whichever settings container is currently open (desktop modal or mobile sheet)
+function refreshSettingsUI() {
+    var modal = document.getElementById('featuresModal');
+    if (modal && modal.classList.contains('show') && typeof openFeaturesModal === 'function') {
+        openFeaturesModal(); return;
+    }
+    if (typeof _sheetCurrentAction !== 'undefined' && _sheetCurrentAction === 'settings') {
+        var body  = document.getElementById('mobileSheetBody');
+        var title = document.getElementById('mobileSheetTitle');
+        if (body && title && typeof buildSheetSettings === 'function') {
+            body.innerHTML = '';
+            buildSheetSettings(body, title);
+        }
+    }
+}
+
 // ════════════════════════════════════════════════════════════════════
 // v10.13 — Daily verse notification via Web Push
 // ════════════════════════════════════════════════════════════════════
@@ -5108,6 +5126,11 @@ var PUSH_SERVER_URL  = 'https://quran-push-server-production.up.railway.app';
 var VAPID_PUBLIC_KEY = 'BFZJh92I-qypfw2ZKsJoBbD0IwN7O13EBvFWE_GIVGbtQSfMrnxNR5Re3DP-Ex1uQdF-xtiKXD-ijbocrYzTleE';
 var PUSH_NOTIF_HOUR_KEY = 'quranNotifHour';
 var PUSH_NOTIF_MIN_KEY  = 'quranNotifMinute';
+
+function fmtNotifTime(h, m) {
+    var p = function(n) { return n < 10 ? '0' + n : '' + n; };
+    return (h % 12 || 12) + ':' + p(m) + ' ' + (h >= 12 ? 'PM' : 'AM');
+}
 
 function urlBase64ToUint8Array(base64String) {
     var padding = '='.repeat((4 - base64String.length % 4) % 4);
@@ -5123,39 +5146,124 @@ function showNotifTimePicker(onConfirm, onCancel) {
     try { savedHour = parseInt(localStorage.getItem(PUSH_NOTIF_HOUR_KEY) || '8'); } catch(e) {}
     try { var _m = localStorage.getItem(PUSH_NOTIF_MIN_KEY); if (_m !== null) savedMin = parseInt(_m); } catch(e) {}
     var pad = function(n) { return n < 10 ? '0' + n : '' + n; };
-    var defaultVal = pad(savedHour) + ':' + pad(savedMin);
     var tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
 
+    // Convert saved 24h time to 12h + period
+    var hour12 = savedHour % 12 || 12;
+    var period  = savedHour >= 12 ? 'PM' : 'AM';
+    var min5    = Math.min(55, Math.round(savedMin / 5) * 5);
+
+    // Build overlay
     var overlay = document.createElement('div');
     overlay.className = 'notif-time-overlay';
-    overlay.innerHTML =
-        '<div class="notif-time-card">' +
-            '<h3>🔔 Daily notification time</h3>' +
-            '<p>Choose when you\'d like to receive your daily Quran verse.' +
-            (tz ? '<br><small>Your timezone: ' + tz + '</small>' : '') + '</p>' +
-            '<input class="notif-time-input" type="time" value="' + defaultVal + '" />' +
-            '<div class="notif-time-actions">' +
-                '<button class="btn-cancel">Cancel</button>' +
-                '<button class="btn-confirm">Confirm</button>' +
-            '</div>' +
-        '</div>';
 
+    var card = document.createElement('div');
+    card.className = 'notif-time-card';
+
+    var h3 = document.createElement('h3');
+    h3.textContent = '🔔 Daily notification time';
+    card.appendChild(h3);
+
+    var desc = document.createElement('p');
+    desc.textContent = "Choose when you'd like to receive your daily Quran verse.";
+    if (tz) { var sm = document.createElement('small'); sm.textContent = 'Timezone: ' + tz; desc.appendChild(document.createElement('br')); desc.appendChild(sm); }
+    card.appendChild(desc);
+
+    // ── Custom picker row ──
+    var pickerRow = document.createElement('div');
+    pickerRow.className = 'notif-time-picker-row';
+
+    // Hour select (1–12)
+    var hourSel = document.createElement('select');
+    hourSel.className = 'notif-time-sel';
+    for (var h = 1; h <= 12; h++) {
+        var hOpt = document.createElement('option');
+        hOpt.value = h;
+        hOpt.textContent = h;
+        if (h === hour12) hOpt.selected = true;
+        hourSel.appendChild(hOpt);
+    }
+
+    var sep = document.createElement('span');
+    sep.className = 'notif-time-sep';
+    sep.textContent = ':';
+
+    // Minute select (5-min steps)
+    var minSel = document.createElement('select');
+    minSel.className = 'notif-time-sel';
+    for (var mn = 0; mn < 60; mn += 5) {
+        var mOpt = document.createElement('option');
+        mOpt.value = mn;
+        mOpt.textContent = pad(mn);
+        if (mn === min5) mOpt.selected = true;
+        minSel.appendChild(mOpt);
+    }
+
+    // AM / PM pill buttons
+    var ampmGroup = document.createElement('div');
+    ampmGroup.className = 'notif-ampm-group';
+
+    var amBtn = document.createElement('button');
+    amBtn.type = 'button';
+    amBtn.className = 'notif-ampm-btn' + (period === 'AM' ? ' active' : '');
+    amBtn.textContent = 'AM';
+
+    var pmBtn = document.createElement('button');
+    pmBtn.type = 'button';
+    pmBtn.className = 'notif-ampm-btn' + (period === 'PM' ? ' active' : '');
+    pmBtn.textContent = 'PM';
+
+    amBtn.addEventListener('click', function() {
+        period = 'AM';
+        amBtn.classList.add('active');
+        pmBtn.classList.remove('active');
+    });
+    pmBtn.addEventListener('click', function() {
+        period = 'PM';
+        pmBtn.classList.add('active');
+        amBtn.classList.remove('active');
+    });
+
+    ampmGroup.appendChild(amBtn);
+    ampmGroup.appendChild(pmBtn);
+    pickerRow.appendChild(hourSel);
+    pickerRow.appendChild(sep);
+    pickerRow.appendChild(minSel);
+    pickerRow.appendChild(ampmGroup);
+    card.appendChild(pickerRow);
+
+    // Action buttons
+    var actions = document.createElement('div');
+    actions.className = 'notif-time-actions';
+    var cancelBtn = document.createElement('button');
+    cancelBtn.className = 'btn-cancel';
+    cancelBtn.textContent = 'Cancel';
+    var confirmBtn = document.createElement('button');
+    confirmBtn.className = 'btn-confirm';
+    confirmBtn.textContent = 'Confirm';
+    actions.appendChild(cancelBtn);
+    actions.appendChild(confirmBtn);
+    card.appendChild(actions);
+
+    overlay.appendChild(card);
     document.body.appendChild(overlay);
 
-    overlay.querySelector('.btn-cancel').addEventListener('click', function() {
+    cancelBtn.addEventListener('click', function() {
         document.body.removeChild(overlay);
         if (onCancel) onCancel();
     });
 
-    overlay.querySelector('.btn-confirm').addEventListener('click', function() {
-        var val = overlay.querySelector('.notif-time-input').value || '08:00';
-        var parts = val.split(':');
-        var hour   = parseInt(parts[0]) || 0;
-        var minute = parseInt(parts[1]) || 0;
-        try { localStorage.setItem(PUSH_NOTIF_HOUR_KEY, String(hour)); } catch(e) {}
-        try { localStorage.setItem(PUSH_NOTIF_MIN_KEY,  String(minute)); } catch(e) {}
+    confirmBtn.addEventListener('click', function() {
+        var h12val = parseInt(hourSel.value);
+        var minVal = parseInt(minSel.value);
+        // Convert 12h + period back to 24h
+        var hour24 = period === 'PM'
+            ? (h12val === 12 ? 12 : h12val + 12)
+            : (h12val === 12 ? 0  : h12val);
+        try { localStorage.setItem(PUSH_NOTIF_HOUR_KEY, String(hour24)); } catch(e) {}
+        try { localStorage.setItem(PUSH_NOTIF_MIN_KEY,  String(minVal));  } catch(e) {}
         document.body.removeChild(overlay);
-        if (onConfirm) onConfirm(hour, minute);
+        if (onConfirm) onConfirm(hour24, minVal);
     });
 }
 
@@ -5216,6 +5324,8 @@ async function setupDailyVerseNotification(skipPicker) {
         showNotifTimePicker(async function(hour, minute) {
             try {
                 await doSubscribe(hour, minute);
+                var chip = document.getElementById('notifTimeValEl');
+                if (chip) chip.textContent = fmtNotifTime(hour, minute);
                 if (typeof showToast === 'function') showToast('Notifications set for ' + pad(hour) + ':' + pad(minute) + ' every day');
             } catch(err) {
                 console.warn('[Notif] subscription failed', err);
@@ -5990,7 +6100,7 @@ function appendYtChannelUI(body) {
             vEl = document.createElement('div');
             vEl.className = 'app-version-footer';
         }
-        vEl.textContent = 'Quran Display v10.19';
+        vEl.textContent = 'Quran Display v10.20';
         body.appendChild(vEl);
     }
 
