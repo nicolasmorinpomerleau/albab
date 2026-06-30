@@ -1354,9 +1354,11 @@ function appendFeaturesUI(body) {
     readSec.appendChild(notifLabel);
 
     var isNotifOn = !!f['dailyVerseNotification'];
-    var savedHour = 8;
+    var savedHour = 8, savedMinute = 0;
     try { var _sh = localStorage.getItem(PUSH_NOTIF_HOUR_KEY); if (_sh !== null) savedHour = parseInt(_sh); } catch(e) {}
-    function _fmtHour(h) { var p = h >= 12 ? 'PM' : 'AM'; return (h % 12 || 12) + ':00 ' + p; }
+    try { var _sm = localStorage.getItem(PUSH_NOTIF_MIN_KEY);  if (_sm !== null) savedMinute = parseInt(_sm); } catch(e) {}
+    var _pad = function(n) { return n < 10 ? '0' + n : '' + n; };
+    function _fmtTime(h, m) { var p = h >= 12 ? 'PM' : 'AM'; return (h % 12 || 12) + ':' + _pad(m) + ' ' + p; }
 
     var notifCard = document.createElement('div');
     notifCard.className = 'notif-settings-card' + (isNotifOn ? '' : ' notif-off');
@@ -1366,7 +1368,7 @@ function appendFeaturesUI(body) {
     var notifTitle = document.createElement('div');
     notifTitle.className = 'notif-settings-card-title';
     notifTitle.textContent = '🔔 Daily verse notification';
-    var notifSwWrap = document.createElement('span');
+    var notifSwWrap = document.createElement('label');
     notifSwWrap.className = 'feature-toggle-sw';
     var notifInp = document.createElement('input');
     notifInp.type = 'checkbox';
@@ -1388,13 +1390,13 @@ function appendFeaturesUI(body) {
     var notifTimeChip = document.createElement('div');
     notifTimeChip.className = 'notif-settings-time-chip';
     var notifTimeVal = document.createElement('span');
-    notifTimeVal.textContent = _fmtHour(savedHour);
+    notifTimeVal.textContent = _fmtTime(savedHour, savedMinute);
     notifTimeChip.appendChild(notifTimeVal);
     notifTimeChip.insertAdjacentHTML('beforeend', ' <span style="font-size:10px;opacity:0.6">✏️</span>');
     notifTimeChip.addEventListener('click', function() {
-        showNotifTimePicker(function(newHour) {
-            notifTimeVal.textContent = _fmtHour(newHour);
-            if (typeof doSubscribe === 'function') doSubscribe(newHour);
+        showNotifTimePicker(function(newHour, newMinute) {
+            notifTimeVal.textContent = _fmtTime(newHour, newMinute);
+            if (typeof doSubscribe === 'function') doSubscribe(newHour, newMinute);
             showToast('✓ Notification time updated');
         });
     });
@@ -5105,6 +5107,7 @@ function refreshTopReadingTime() {
 var PUSH_SERVER_URL  = 'https://quran-push-server-production.up.railway.app';
 var VAPID_PUBLIC_KEY = 'BFZJh92I-qypfw2ZKsJoBbD0IwN7O13EBvFWE_GIVGbtQSfMrnxNR5Re3DP-Ex1uQdF-xtiKXD-ijbocrYzTleE';
 var PUSH_NOTIF_HOUR_KEY = 'quranNotifHour';
+var PUSH_NOTIF_MIN_KEY  = 'quranNotifMinute';
 
 function urlBase64ToUint8Array(base64String) {
     var padding = '='.repeat((4 - base64String.length % 4) % 4);
@@ -5116,10 +5119,11 @@ function urlBase64ToUint8Array(base64String) {
 }
 
 function showNotifTimePicker(onConfirm, onCancel) {
-    var savedHour = 8;
+    var savedHour = 8, savedMin = 0;
     try { savedHour = parseInt(localStorage.getItem(PUSH_NOTIF_HOUR_KEY) || '8'); } catch(e) {}
+    try { var _m = localStorage.getItem(PUSH_NOTIF_MIN_KEY); if (_m !== null) savedMin = parseInt(_m); } catch(e) {}
     var pad = function(n) { return n < 10 ? '0' + n : '' + n; };
-    var defaultVal = pad(savedHour) + ':00';
+    var defaultVal = pad(savedHour) + ':' + pad(savedMin);
     var tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
 
     var overlay = document.createElement('div');
@@ -5145,20 +5149,23 @@ function showNotifTimePicker(onConfirm, onCancel) {
 
     overlay.querySelector('.btn-confirm').addEventListener('click', function() {
         var val = overlay.querySelector('.notif-time-input').value || '08:00';
-        var hour = parseInt(val.split(':')[0]);
+        var parts = val.split(':');
+        var hour   = parseInt(parts[0]) || 0;
+        var minute = parseInt(parts[1]) || 0;
         try { localStorage.setItem(PUSH_NOTIF_HOUR_KEY, String(hour)); } catch(e) {}
+        try { localStorage.setItem(PUSH_NOTIF_MIN_KEY,  String(minute)); } catch(e) {}
         document.body.removeChild(overlay);
-        if (onConfirm) onConfirm(hour);
+        if (onConfirm) onConfirm(hour, minute);
     });
 }
 
-async function doSubscribe(notifHour) {
+async function doSubscribe(notifHour, notifMinute) {
+    if (notifMinute === undefined) notifMinute = 0;
     var tzOffset = new Date().getTimezoneOffset();
     var reg = await navigator.serviceWorker.ready;
     var existing = await reg.pushManager.getSubscription();
     if (existing) {
-        // Update hour on server even if already subscribed
-        var payload = Object.assign(JSON.parse(JSON.stringify(existing)), { notifHour: notifHour, tzOffset: tzOffset });
+        var payload = Object.assign(JSON.parse(JSON.stringify(existing)), { notifHour: notifHour, notifMinute: notifMinute, tzOffset: tzOffset });
         await fetch(PUSH_SERVER_URL + '/subscribe', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -5170,7 +5177,7 @@ async function doSubscribe(notifHour) {
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
     });
-    var payload = Object.assign(JSON.parse(JSON.stringify(subscription)), { notifHour: notifHour, tzOffset: tzOffset });
+    var payload = Object.assign(JSON.parse(JSON.stringify(subscription)), { notifHour: notifHour, notifMinute: notifMinute, tzOffset: tzOffset });
     await fetch(PUSH_SERVER_URL + '/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -5199,15 +5206,17 @@ async function setupDailyVerseNotification(skipPicker) {
         } catch(e) { return false; }
     }
 
-    var savedHour = null;
+    var savedHour = null, savedMinute = 0;
     try { var s = localStorage.getItem(PUSH_NOTIF_HOUR_KEY); if (s !== null) savedHour = parseInt(s); } catch(e) {}
+    try { var sm = localStorage.getItem(PUSH_NOTIF_MIN_KEY); if (sm !== null) savedMinute = parseInt(sm); } catch(e) {}
+
+    var pad = function(n) { return n < 10 ? '0' + n : '' + n; };
 
     if (!skipPicker && savedHour === null) {
-        showNotifTimePicker(async function(hour) {
+        showNotifTimePicker(async function(hour, minute) {
             try {
-                await doSubscribe(hour);
-                var pad = function(n) { return n < 10 ? '0' + n : '' + n; };
-                if (typeof showToast === 'function') showToast('Notifications set for ' + pad(hour) + ':00 every day');
+                await doSubscribe(hour, minute);
+                if (typeof showToast === 'function') showToast('Notifications set for ' + pad(hour) + ':' + pad(minute) + ' every day');
             } catch(err) {
                 console.warn('[Notif] subscription failed', err);
                 if (typeof showToast === 'function') showToast('Could not enable notifications');
@@ -5218,11 +5227,11 @@ async function setupDailyVerseNotification(skipPicker) {
         });
     } else {
         var hour = savedHour !== null ? savedHour : 8;
+        var minute = savedMinute;
         try {
-            await doSubscribe(hour);
+            await doSubscribe(hour, minute);
             if (!skipPicker) {
-                var pad = function(n) { return n < 10 ? '0' + n : '' + n; };
-                if (typeof showToast === 'function') showToast('Notifications set for ' + pad(hour) + ':00 every day');
+                if (typeof showToast === 'function') showToast('Notifications set for ' + pad(hour) + ':' + pad(minute) + ' every day');
             }
         } catch(e) {
             console.warn('[Notif] subscription failed', e);
@@ -5245,6 +5254,7 @@ async function teardownDailyVerseNotification() {
         });
         await subscription.unsubscribe();
         try { localStorage.removeItem(PUSH_NOTIF_HOUR_KEY); } catch(e) {}
+        try { localStorage.removeItem(PUSH_NOTIF_MIN_KEY);  } catch(e) {}
     } catch(e) {
         console.warn('[Notif] unsubscribe failed', e);
     }
@@ -5980,7 +5990,7 @@ function appendYtChannelUI(body) {
             vEl = document.createElement('div');
             vEl.className = 'app-version-footer';
         }
-        vEl.textContent = 'Quran Display v10.18';
+        vEl.textContent = 'Quran Display v10.19';
         body.appendChild(vEl);
     }
 
