@@ -332,6 +332,93 @@ document.getElementById('transFontSlider').addEventListener('change', function()
 });
 
 // ═══════════════════════════════════════════════════════════════════
+// PINCH-TO-ZOOM — content only (header + footer are never affected)
+// Native browser zoom is disabled in <meta viewport> (user-scalable=no).
+// This handler intercepts 2-finger pinches on #quranContainer and
+// adjusts font sizes via the existing applyFontSizes() system so the
+// layout reflows naturally and scroll always works correctly.
+// Double-tap anywhere in the content area resets to default sizes.
+// ═══════════════════════════════════════════════════════════════════
+(function initPinchZoom() {
+    var container = document.getElementById('quranContainer');
+    if (!container) return;
+
+    var _pinchActive    = false;
+    var _pinchStartDist = 0;
+    var _pinchStartAr   = 0;
+    var _pinchStartTr   = 0;
+    var _lastTap        = 0;
+    var _indicator      = null;
+    var _hideTimer      = null;
+    var _defaultAr      = _isPhone ? 1.6 : 2.8;
+    var _defaultTr      = _isPhone ? 1.0 : 1.87;
+
+    function _pinchDist(touches) {
+        var dx = touches[0].clientX - touches[1].clientX;
+        var dy = touches[0].clientY - touches[1].clientY;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    function _showIndicator(pct) {
+        if (!_indicator) {
+            _indicator = document.createElement('div');
+            _indicator.className = 'pinch-zoom-indicator';
+            document.body.appendChild(_indicator);
+        }
+        _indicator.textContent = Math.round(pct) + '%';
+        _indicator.classList.add('show');
+        clearTimeout(_hideTimer);
+        _hideTimer = setTimeout(function() {
+            if (_indicator) _indicator.classList.remove('show');
+        }, 1000);
+    }
+
+    container.addEventListener('touchstart', function(e) {
+        if (e.touches.length === 2) {
+            _pinchActive    = true;
+            _pinchStartDist = _pinchDist(e.touches);
+            _pinchStartAr   = fontSizes.arabic;
+            _pinchStartTr   = fontSizes.trans;
+            e.preventDefault();
+            return;
+        }
+        // Double-tap to reset font size
+        if (e.touches.length === 1) {
+            var now = Date.now();
+            if (now - _lastTap < 280) {
+                fontSizes.arabic = _defaultAr;
+                fontSizes.trans  = _defaultTr;
+                lsSet(FONT_KEY, fontSizes);
+                applyFontSizes();
+                _showIndicator(100);
+                e.preventDefault();
+            }
+            _lastTap = now;
+        }
+    }, { passive: false });
+
+    container.addEventListener('touchmove', function(e) {
+        if (!_pinchActive || e.touches.length !== 2) return;
+        e.preventDefault();
+        var ratio     = _pinchDist(e.touches) / _pinchStartDist;
+        var newAr     = Math.min(5,   Math.max(1.2, _pinchStartAr * ratio));
+        var newTr     = Math.min(3,   Math.max(0.7, _pinchStartTr * ratio));
+        fontSizes.arabic = Math.round(newAr * 10) / 10;
+        fontSizes.trans  = Math.round(newTr * 20) / 20;
+        applyFontSizes();
+        _showIndicator((fontSizes.arabic / _defaultAr) * 100);
+    }, { passive: false });
+
+    container.addEventListener('touchend', function(e) {
+        if (!_pinchActive) return;
+        if (e.touches.length < 2) {
+            _pinchActive = false;
+            lsSet(FONT_KEY, fontSizes);
+        }
+    }, { passive: true });
+}());
+
+// ═══════════════════════════════════════════════════════════════════
 // SEARCH HISTORY
 // ═══════════════════════════════════════════════════════════════════
 function getSearchHistory() { return lsGet(SEARCH_HX_KEY, []); }
@@ -3534,7 +3621,7 @@ function buildSheetSettings(body, title) {
     // Version footer
     var verEl = document.createElement('div');
     verEl.className = 'mob-settings-version';
-    verEl.textContent = 'Quran Display v11.0';
+    verEl.textContent = 'Quran Display v11.2';
     body.appendChild(verEl);
 }
 
@@ -3703,7 +3790,7 @@ document.querySelectorAll('.bnav-btn').forEach(function(btn) {
     var feedbackBtn = document.getElementById('mdFeedbackBtn');
     if (feedbackBtn) feedbackBtn.addEventListener('click', function() {
         closeMobileDrawer();
-        window.open('mailto:contact@amcreatives.ca?subject=Quran%20App%20Feedback&body=Version%3A%20v11.0.0%0A%0A', '_blank');
+        window.open('mailto:contact@amcreatives.ca?subject=Quran%20App%20Feedback&body=Version%3A%20v11.2.0%0A%0A', '_blank');
         // Reopen drawer after mail client is opened (slight delay for UX)
         setTimeout(openMobileDrawer, 600);
     });

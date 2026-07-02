@@ -5093,3 +5093,29 @@ body.feature-off-khatm .khatm-calendar { display: none; }
 }
 .mob-help-item:last-child { border-bottom: none; }
 .mob-help-ico { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+
+/* ── Pinch-to-zoom indicator ── */
+.pinch-zoom-indicator {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.75);
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    padding: 12px 22px;
+    border-radius: 14px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    z-index: 99999;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+.pinch-zoom-indicator.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}

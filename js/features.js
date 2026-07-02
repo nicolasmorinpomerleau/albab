@@ -2374,10 +2374,6 @@ function appendReadingPlanUI(body) {
             try { sessionStorage.removeItem('readingPlanPillDismissed'); } catch(e) {}
             if (typeof renderReadingPlanCard === 'function') renderReadingPlanCard();
             if (typeof showToast === 'function') showToast('Window restored');
-            var mSheet = document.getElementById('mobileSheet');
-            if (mSheet && mSheet.classList.contains('open') && typeof closeMobileSheet === 'function') {
-                setTimeout(closeMobileSheet, 150);
-            }
         });
         btnRow.appendChild(showPillBtn);
 
@@ -2836,6 +2832,34 @@ function appendInstallUI(body) {
         hint.style.cssText = 'font-size:24px;font-weight:700;color:#4caf50;text-align:center;padding:14px 0 4px;line-height:1.3;';
         hint.textContent = '✅ Installed — works offline';
         sec.appendChild(hint);
+
+        // If we're NOT in standalone mode, the localStorage flag could be stale (app was uninstalled).
+        // Verify via the Chrome API; if that's unavailable, show a manual reset link.
+        if (!isStandalone && wasInstalled) {
+            if ('getInstalledRelatedApps' in navigator) {
+                navigator.getInstalledRelatedApps().then(function(apps) {
+                    if (apps.length === 0) {
+                        try { localStorage.removeItem('quranPWAInstalled'); } catch(e) {}
+                        var s = body.querySelector('[data-install-section]');
+                        if (s) { s.remove(); appendInstallUI(body); }
+                    }
+                }).catch(function(){});
+            }
+            var resetWrap = document.createElement('div');
+            resetWrap.style.cssText = 'margin-top:10px;text-align:center;font-size:11px;color:var(--text-secondary);opacity:0.6;';
+            var resetLink = document.createElement('a');
+            resetLink.href = '#';
+            resetLink.style.cssText = 'color:inherit;text-decoration:underline;';
+            resetLink.textContent = 'Uninstalled? Tap to reset';
+            resetLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                try { localStorage.removeItem('quranPWAInstalled'); } catch(e) {}
+                var s = body.querySelector('[data-install-section]');
+                if (s) { s.remove(); appendInstallUI(body); }
+            });
+            resetWrap.appendChild(resetLink);
+            sec.appendChild(resetWrap);
+        }
     } else if (window._pwaInstallable) {
         hint.textContent = 'Install this app on your device for an icon on your home screen, faster startup, and full offline reading.';
         sec.appendChild(hint);
@@ -6220,7 +6244,7 @@ function appendYtChannelUI(body) {
             vEl = document.createElement('div');
             vEl.className = 'app-version-footer';
         }
-        vEl.textContent = 'Quran Display v11.0';
+        vEl.textContent = 'Quran Display v11.2';
         body.appendChild(vEl);
     }
 
