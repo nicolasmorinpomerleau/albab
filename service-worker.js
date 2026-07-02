@@ -1,8 +1,8 @@
-/* Quran Display — Service Worker (v11.3) */
+/* Quran Display — Service Worker (v11.4) */
 'use strict';
 
 // Bump this version string whenever you ship updates so the SW activates fresh.
-const CACHE_VERSION = 'v11.3.0';
+const CACHE_VERSION = 'v11.4.0';
 const SHELL_CACHE   = 'quran-shell-' + CACHE_VERSION;
 const DATA_CACHE    = 'quran-data-' + CACHE_VERSION;
 

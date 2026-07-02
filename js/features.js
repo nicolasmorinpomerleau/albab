@@ -1154,7 +1154,7 @@ function buildVerseNav() {
 // ═══════════════════════════════════════════════════════════════════
 function exportAllData() {
     var data = {
-        version:      (typeof vEl !== 'undefined' && vEl.textContent) ? vEl.textContent.replace('Quran Display ', '') : 'v11.3',
+        version:      (typeof vEl !== 'undefined' && vEl.textContent) ? vEl.textContent.replace('Quran Display ', '') : 'v11.4',
         exportedAt:   new Date().toISOString(),
         bookmarks:    JSON.parse(localStorage.getItem('quranBookmarks') || '[]'),
         notes:        JSON.parse(localStorage.getItem('quranNotes') || '{}'),
@@ -2797,12 +2797,12 @@ function startPlan(planType, customDays) {
                 console.warn('[PWA] Service worker registration failed:', err);
             });
 
-            // Reload page when SW takes over (for skip-waiting flow)
+            // Auto-reload once the new SW takes control (happens after user clicks "Reload" → SKIP_WAITING)
             var refreshing = false;
             navigator.serviceWorker.addEventListener('controllerchange', function() {
                 if (refreshing) return;
                 refreshing = true;
-                // Don't auto-reload here — let the explicit Reload button handle it
+                window.location.reload();
             });
         });
     }
@@ -5295,54 +5295,6 @@ function refreshTopReadingTime() {
     }
 }());
 
-// ════════════════════════════════════════════════════════════════════
-// v10.13 — New version available notification
-// Shows a pill banner when the service worker detects an update
-// ════════════════════════════════════════════════════════════════════
-(function initUpdateNotification() {
-    if (!('serviceWorker' in navigator)) return;
-
-    function showUpdateBanner() {
-        if (document.getElementById('updateBanner')) return;
-        var banner = document.createElement('div');
-        banner.id = 'updateBanner';
-        banner.className = 'update-banner';
-        banner.innerHTML =
-            '<span class="update-banner-text">✨ New version available</span>' +
-            '<button class="update-banner-btn" id="updateBannerBtn">Reload</button>' +
-            '<button class="update-banner-close" id="updateBannerClose">✕</button>';
-        document.body.appendChild(banner);
-        setTimeout(function() { banner.classList.add('show'); }, 50);
-        document.getElementById('updateBannerBtn').addEventListener('click', function() {
-            window.location.reload();
-        });
-        document.getElementById('updateBannerClose').addEventListener('click', function() {
-            banner.classList.remove('show');
-            setTimeout(function() { if (banner.parentNode) banner.remove(); }, 300);
-        });
-    }
-
-    // React when new SW takes control
-    navigator.serviceWorker.addEventListener('controllerchange', function() {
-        showUpdateBanner();
-    });
-
-    // Also check on load if there's a waiting SW (user had the page open during update)
-    navigator.serviceWorker.ready.then(function(reg) {
-        if (reg.waiting) {
-            showUpdateBanner();
-        }
-        reg.addEventListener('updatefound', function() {
-            var installing = reg.installing;
-            if (!installing) return;
-            installing.addEventListener('statechange', function() {
-                if (installing.state === 'installed' && navigator.serviceWorker.controller) {
-                    showUpdateBanner();
-                }
-            });
-        });
-    }).catch(function() {});
-}());
 
 // ════════════════════════════════════════════════════════════════════
 // v10.10 — Final injection layer: Export & Data section always at the
@@ -6391,7 +6343,7 @@ function appendYtChannelUI(body) {
             vEl = document.createElement('div');
             vEl.className = 'app-version-footer';
         }
-        vEl.textContent = 'Quran Display v11.3';
+        vEl.textContent = 'Quran Display v11.4';
         body.appendChild(vEl);
     }
 

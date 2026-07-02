@@ -1,7 +1,7 @@
 'use strict';
 
 // ═══════════════════════════════════════════════════════════════════
-// QURAN DISPLAY v11.3
+// QURAN DISPLAY v11.4
 // Features: Juz nav · Search history · Bookmarks · Reading history
 //           Verse highlighting · Personal notes · Font size slider
 // ═══════════════════════════════════════════════════════════════════
@@ -3622,7 +3622,7 @@ function buildSheetSettings(body, title) {
     // Version footer
     var verEl = document.createElement('div');
     verEl.className = 'mob-settings-version';
-    verEl.textContent = 'Quran Display v11.3';
+    verEl.textContent = 'Quran Display v11.4';
     body.appendChild(verEl);
 }
 
@@ -3791,7 +3791,7 @@ document.querySelectorAll('.bnav-btn').forEach(function(btn) {
     var feedbackBtn = document.getElementById('mdFeedbackBtn');
     if (feedbackBtn) feedbackBtn.addEventListener('click', function() {
         closeMobileDrawer();
-        window.open('mailto:contact@amcreatives.ca?subject=Quran%20App%20Feedback&body=Version%3A%20v11.3.0%0A%0A', '_blank');
+        window.open('mailto:contact@amcreatives.ca?subject=Quran%20App%20Feedback&body=Version%3A%20v11.4.0%0A%0A', '_blank');
         // Reopen drawer after mail client is opened (slight delay for UX)
         setTimeout(openMobileDrawer, 600);
     });
