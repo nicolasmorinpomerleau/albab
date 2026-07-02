@@ -1,7 +1,7 @@
 'use strict';
 
 // ═══════════════════════════════════════════════════════════════════
-// QURAN DISPLAY v9
+// QURAN DISPLAY v11.3
 // Features: Juz nav · Search history · Bookmarks · Reading history
 //           Verse highlighting · Personal notes · Font size slider
 // ═══════════════════════════════════════════════════════════════════
@@ -1216,13 +1216,13 @@ function buildTocItem(name, city, displayIndex, clickHandler, suraId) {
     // Reading history dot
     if (suraId !== undefined && hasSuraBeenRead(suraId)) {
         const dot = document.createElement('span');
-        dot.className = 'history-dot'; dot.title = 'Previously read';
+        dot.className = 'history-dot'; dot.title = (typeof getL === 'function' ? getL().previouslyRead : 'Previously read');
         nameSpan.appendChild(dot);
     }
     // v10.12: Golden dot if this surah has any saved item (bookmark/note/highlight/reflection)
     if (suraId !== undefined && suraHasSavedItems(suraId)) {
         const sdot = document.createElement('span');
-        sdot.className = 'saved-dot'; sdot.title = 'Has saved items';
+        sdot.className = 'saved-dot'; sdot.title = (typeof getL === 'function' ? getL().hasSavedItems : 'Has saved items');
         nameSpan.appendChild(sdot);
     }
     left.appendChild(nameSpan);
@@ -1318,7 +1318,7 @@ function generateJuzTOC() {
         const nameEl = document.createElement('span');
         nameEl.classList.add('juz-name'); nameEl.textContent = juzAr;
         const subEl = document.createElement('span');
-        subEl.classList.add('juz-sub'); subEl.textContent = 'Starts: ' + startName + (ayahNum > 1 ? ' v.' + ayahNum : '');
+        subEl.classList.add('juz-sub'); subEl.textContent = (typeof getL === 'function' ? getL().juzStarts : 'Starts:') + ' ' + startName + (ayahNum > 1 ? ' v.' + ayahNum : '');
         info.appendChild(nameEl); info.appendChild(subEl);
         item.appendChild(numEl); item.appendChild(info);
         item.addEventListener('click', function() {
@@ -1954,6 +1954,7 @@ function highlightAndScrollToVerse(suraId, verseNumber) {
     });
     const target = verseEls[verseNumber - 1];
     if (target) target.scrollIntoView({ behavior:'smooth' });
+    if (typeof attachAudioButtons === 'function') setTimeout(attachAudioButtons, 80);
     clearSuraContext();
 }
 
@@ -2581,7 +2582,7 @@ function buildSheetJuzInBody(body) {
         var ar = document.createElement('div');
         ar.className = 'mob-juz-ar'; ar.textContent = juz[1];
         var sub = document.createElement('div');
-        sub.className = 'mob-juz-sub'; sub.textContent = 'Starts: ' + juz[4] + (juz[3] > 1 ? ' v.' + juz[3] : '');
+        sub.className = 'mob-juz-sub'; sub.textContent = (typeof getL === 'function' ? getL().juzStarts : 'Starts:') + ' ' + juz[4] + (juz[3] > 1 ? ' v.' + juz[3] : '');
         info.appendChild(ar); info.appendChild(sub);
         item.appendChild(num); item.appendChild(info);
         item.addEventListener('click', function() {
@@ -2667,7 +2668,7 @@ function buildSheetJuz(body, title) {
         var ar = document.createElement('div');
         ar.className = 'mob-juz-ar'; ar.textContent = juz[1];
         var sub = document.createElement('div');
-        sub.className = 'mob-juz-sub'; sub.textContent = 'Starts: ' + juz[4] + (juz[3] > 1 ? ' v.' + juz[3] : '');
+        sub.className = 'mob-juz-sub'; sub.textContent = (typeof getL === 'function' ? getL().juzStarts : 'Starts:') + ' ' + juz[4] + (juz[3] > 1 ? ' v.' + juz[3] : '');
         info.appendChild(ar); info.appendChild(sub);
         item.appendChild(num); item.appendChild(info);
         item.addEventListener('click', function() {
@@ -3621,7 +3622,7 @@ function buildSheetSettings(body, title) {
     // Version footer
     var verEl = document.createElement('div');
     verEl.className = 'mob-settings-version';
-    verEl.textContent = 'Quran Display v11.2';
+    verEl.textContent = 'Quran Display v11.3';
     body.appendChild(verEl);
 }
 
@@ -3790,7 +3791,7 @@ document.querySelectorAll('.bnav-btn').forEach(function(btn) {
     var feedbackBtn = document.getElementById('mdFeedbackBtn');
     if (feedbackBtn) feedbackBtn.addEventListener('click', function() {
         closeMobileDrawer();
-        window.open('mailto:contact@amcreatives.ca?subject=Quran%20App%20Feedback&body=Version%3A%20v11.2.0%0A%0A', '_blank');
+        window.open('mailto:contact@amcreatives.ca?subject=Quran%20App%20Feedback&body=Version%3A%20v11.3.0%0A%0A', '_blank');
         // Reopen drawer after mail client is opened (slight delay for UX)
         setTimeout(openMobileDrawer, 600);
     });

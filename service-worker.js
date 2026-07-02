@@ -1,8 +1,8 @@
-/* Quran Display — Service Worker (v11.2) */
+/* Quran Display — Service Worker (v11.3) */
 'use strict';
 
 // Bump this version string whenever you ship updates so the SW activates fresh.
-const CACHE_VERSION = 'v11.2.0';
+const CACHE_VERSION = 'v11.3.0';
 const SHELL_CACHE   = 'quran-shell-' + CACHE_VERSION;
 const DATA_CACHE    = 'quran-data-' + CACHE_VERSION;
 
@@ -16,13 +16,11 @@ const SHELL_FILES = [
     './js/features.js',
     './manifest.json',
     './favicon.ico',
-    './img/Besmeleh4.png',
-    './img/makkah-icon1.png',
+    './img/makkah-icon.png',
     './img/madinah-icon.png',
     './img/icon-64.png',
     './img/icon-192.png',
-    './img/icon-512.png',
-    './img/Banner2.jpg'
+    './img/icon-512.png'
 ];
 
 // Quran XML data files — also pre-cache so offline reading works immediately
@@ -31,10 +29,14 @@ const DATA_FILES = [
     './data/quran-french.xml',
     './data/quran-english.xml',
     './data/quran-spanish.xml',
+    './data/context/context-arabic1.xml',
+    './data/context/context-arabic2.xml',
     './data/context/context-french1.xml',
     './data/context/context-french2.xml',
     './data/context/context-english1.xml',
     './data/context/context-english2.xml',
+    './data/context/context-spanish1.xml',
+    './data/context/context-spanish2.xml',
     './data/youtube_fr.json'
 ];
 
