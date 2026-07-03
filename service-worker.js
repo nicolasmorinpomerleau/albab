@@ -1,8 +1,8 @@
-/* Quran Display — Service Worker (v11.4) */
+/* Quran Display — Service Worker (v11.6) */
 'use strict';
 
 // Bump this version string whenever you ship updates so the SW activates fresh.
-const CACHE_VERSION = 'v11.4.0';
+const CACHE_VERSION = 'v11.6.0';
 const SHELL_CACHE   = 'quran-shell-' + CACHE_VERSION;
 const DATA_CACHE    = 'quran-data-' + CACHE_VERSION;
 
@@ -61,7 +61,9 @@ self.addEventListener('install', function(event) {
                 }));
             })
         ]).then(function() {
-            // Activate immediately on first install
+            // Force the new SW to activate immediately so mobile PWA users
+            // always get updates — without this, the waiting SW never activates
+            // on mobile where users rarely close all tabs.
             return self.skipWaiting();
         })
     );

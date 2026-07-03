@@ -1154,7 +1154,7 @@ function buildVerseNav() {
 // ═══════════════════════════════════════════════════════════════════
 function exportAllData() {
     var data = {
-        version:      (typeof vEl !== 'undefined' && vEl.textContent) ? vEl.textContent.replace('Quran Display ', '') : 'v11.4',
+        version:      (typeof vEl !== 'undefined' && vEl.textContent) ? vEl.textContent.replace('Quran Display ', '') : 'v11.6',
         exportedAt:   new Date().toISOString(),
         bookmarks:    JSON.parse(localStorage.getItem('quranBookmarks') || '[]'),
         notes:        JSON.parse(localStorage.getItem('quranNotes') || '{}'),
@@ -2752,57 +2752,40 @@ function startPlan(planType, customDays) {
                 console.info('[PWA] Skipping service worker — file:// not supported. Use Live Server or HTTPS.');
                 return;
             }
+            // Track whether this page already had a SW controller on load.
+            // Used to skip showing the update pill on very first install (no previous version).
+            var _hadController = !!navigator.serviceWorker.controller;
+
             navigator.serviceWorker.register('service-worker.js').then(function(reg) {
                 console.info('[PWA] Service worker registered, scope:', reg.scope);
-
-                // v10.11: Helper to show the update pill (extracted for reuse)
-                function showUpdatePill(workerToActivate) {
-                    if (document.querySelector('.pwa-update-bar')) return; // already showing
-                    var bar = document.createElement('div');
-                    bar.className = 'pwa-update-bar';
-                    bar.innerHTML = '<span>📦 New version available</span><button class="pwa-update-btn">Reload</button><button class="pwa-update-dismiss">✕</button>';
-                    document.body.appendChild(bar);
-                    bar.querySelector('.pwa-update-btn').addEventListener('click', function() {
-                        if (workerToActivate && workerToActivate.postMessage) {
-                            workerToActivate.postMessage({ type: 'SKIP_WAITING' });
-                        }
-                        location.reload();
-                    });
-                    bar.querySelector('.pwa-update-dismiss').addEventListener('click', function() {
-                        bar.remove();
-                    });
-                }
-
-                // v10.11: If a SW is ALREADY waiting (installed before this page loaded), show pill now
-                if (reg.waiting && navigator.serviceWorker.controller) {
-                    showUpdatePill(reg.waiting);
-                }
-
-                // Check for updates periodically (every hour)
+                // Poll for updates every hour and on tab focus (catches deployments while app was closed)
                 setInterval(function() { reg.update(); }, 60 * 60 * 1000);
-                // Also check on focus (catches updates that landed while app was closed)
                 window.addEventListener('focus', function() { reg.update(); });
-
-                // Listen for updates discovered during this session
-                reg.addEventListener('updatefound', function() {
-                    var newWorker = reg.installing;
-                    if (!newWorker) return;
-                    newWorker.addEventListener('statechange', function() {
-                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                            showUpdatePill(newWorker);
-                        }
-                    });
-                });
             }).catch(function(err) {
                 console.warn('[PWA] Service worker registration failed:', err);
             });
 
-            // Auto-reload once the new SW takes control (happens after user clicks "Reload" → SKIP_WAITING)
-            var refreshing = false;
+            // The service worker calls self.skipWaiting() in its install event, so the new SW
+            // takes control immediately after installing. When that happens, controllerchange fires.
+            // At that point the new SW IS the controller — a simple reload serves the new files.
             navigator.serviceWorker.addEventListener('controllerchange', function() {
-                if (refreshing) return;
-                refreshing = true;
-                window.location.reload();
+                if (!_hadController) {
+                    // First-ever install: SW just took control for the first time. No update to announce.
+                    _hadController = true;
+                    return;
+                }
+                // An update was applied. Show the pill so the user can reload at their convenience.
+                if (document.querySelector('.pwa-update-bar')) return;
+                var bar = document.createElement('div');
+                bar.className = 'pwa-update-bar';
+                bar.innerHTML = '<span>📦 New version available</span><button class="pwa-update-btn">Reload</button><button class="pwa-update-dismiss">✕</button>';
+                document.body.appendChild(bar);
+                bar.querySelector('.pwa-update-btn').addEventListener('click', function() {
+                    location.reload(); // new SW is already in control — reload serves new files
+                });
+                bar.querySelector('.pwa-update-dismiss').addEventListener('click', function() {
+                    bar.remove();
+                });
             });
         });
     }
@@ -6343,7 +6326,7 @@ function appendYtChannelUI(body) {
             vEl = document.createElement('div');
             vEl.className = 'app-version-footer';
         }
-        vEl.textContent = 'Quran Display v11.4';
+        vEl.textContent = 'Quran Display v11.6';
         body.appendChild(vEl);
     }
 

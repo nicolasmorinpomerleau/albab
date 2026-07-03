@@ -1,7 +1,7 @@
 'use strict';
 
 // ═══════════════════════════════════════════════════════════════════
-// QURAN DISPLAY v11.4
+// QURAN DISPLAY v11.6
 // Features: Juz nav · Search history · Bookmarks · Reading history
 //           Verse highlighting · Personal notes · Font size slider
 // ═══════════════════════════════════════════════════════════════════
@@ -1640,7 +1640,7 @@ function buildSuraDOM(sura) {
     printPill.title = 'Print / Export this surah as PDF';
     printPill.innerHTML =
         '<svg class="spp-svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" xmlns="http://www.w3.org/2000/svg">' +
-            '<path d="M12 3v11.59l-3.3-3.3a1 1 0 0 0-1.4 1.42l5 5a1 1 0 0 0 1.4 0l5-5a1 1 0 0 0-1.4-1.42L13 14.59V3a1 1 0 0 0-2 0z"/>' +
+            '<path d="M12 3v11.69l-3.3-3.3a1 1 0 0 0-1.4 1.42l5 5a1 1 0 0 0 1.4 0l5-5a1 1 0 0 0-1.4-1.42L13 14.59V3a1 1 0 0 0-2 0z"/>' +
             '<path d="M5 19a1 1 0 0 0 0 2h14a1 1 0 0 0 0-2H5z"/>' +
         '</svg>' +
         '<span class="spp-lbl">PDF</span>';
@@ -3622,7 +3622,7 @@ function buildSheetSettings(body, title) {
     // Version footer
     var verEl = document.createElement('div');
     verEl.className = 'mob-settings-version';
-    verEl.textContent = 'Quran Display v11.4';
+    verEl.textContent = 'Quran Display v11.6';
     body.appendChild(verEl);
 }
 
@@ -3791,7 +3791,7 @@ document.querySelectorAll('.bnav-btn').forEach(function(btn) {
     var feedbackBtn = document.getElementById('mdFeedbackBtn');
     if (feedbackBtn) feedbackBtn.addEventListener('click', function() {
         closeMobileDrawer();
-        window.open('mailto:contact@amcreatives.ca?subject=Quran%20App%20Feedback&body=Version%3A%20v11.4.0%0A%0A', '_blank');
+        window.open('mailto:contact@amcreatives.ca?subject=Quran%20App%20Feedback&body=Version%3A%20v11.6.0%0A%0A', '_blank');
         // Reopen drawer after mail client is opened (slight delay for UX)
         setTimeout(openMobileDrawer, 600);
     });
