@@ -1154,7 +1154,7 @@ function buildVerseNav() {
 // ═══════════════════════════════════════════════════════════════════
 function exportAllData() {
     var data = {
-        version:      (typeof vEl !== 'undefined' && vEl.textContent) ? vEl.textContent.replace('Quran Display ', '') : 'v11.7',
+        version:      (typeof vEl !== 'undefined' && vEl.textContent) ? vEl.textContent.replace('Quran Display ', '') : 'v11.8',
         exportedAt:   new Date().toISOString(),
         bookmarks:    JSON.parse(localStorage.getItem('quranBookmarks') || '[]'),
         notes:        JSON.parse(localStorage.getItem('quranNotes') || '{}'),
@@ -2761,9 +2761,17 @@ function startPlan(planType, customDays) {
 
             navigator.serviceWorker.register('service-worker.js').then(function(reg) {
                 console.info('[PWA] Service worker registered, scope:', reg.scope);
-                // Poll for updates every hour and on tab focus (catches deployments while app was closed)
+                // Hourly background check
                 setInterval(function() { reg.update(); }, 60 * 60 * 1000);
-                window.addEventListener('focus', function() { reg.update(); });
+                // Focus check — catches updates when user returns to the app after a deployment.
+                // Rate-limited to once per 10 minutes to prevent false installs on local dev servers.
+                var _lastFocusCheck = 0;
+                window.addEventListener('focus', function() {
+                    var now = Date.now();
+                    if (now - _lastFocusCheck < 10 * 60 * 1000) return;
+                    _lastFocusCheck = now;
+                    reg.update();
+                });
             }).catch(function(err) {
                 console.warn('[PWA] Service worker registration failed:', err);
             });
@@ -2799,6 +2807,10 @@ function startPlan(planType, customDays) {
         e.preventDefault();
         deferredPrompt = e;
         window._pwaInstallable = true;
+        // Chrome only fires this when the app is NOT installed.
+        // Clear any stale "installed" flag so Settings shows the install button
+        // instead of the green "✅ Installed" after the user uninstalls the app.
+        try { localStorage.removeItem('quranPWAInstalled'); } catch(e) {}
         if (typeof updateInstallPill === 'function') updateInstallPill();
         if (typeof showInstallPromptCard === 'function') showInstallPromptCard();
     });
@@ -3030,21 +3042,6 @@ function appendInstallUI(body) {
         hint.style.cssText = 'font-size:24px;font-weight:700;color:#4caf50;text-align:center;padding:14px 0 4px;line-height:1.3;';
         hint.textContent = '✅ Installed — works offline';
         sec.appendChild(hint);
-        // Manual reset link in case user uninstalled the app
-        var resetWrap = document.createElement('div');
-        resetWrap.style.cssText = 'margin-top:10px;text-align:center;font-size:11px;color:var(--text-secondary);opacity:0.6;';
-        var resetLink = document.createElement('a');
-        resetLink.href = '#';
-        resetLink.style.cssText = 'color:inherit;text-decoration:underline;';
-        resetLink.textContent = 'Uninstalled? Tap to reset';
-        resetLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            try { localStorage.removeItem('quranPWAInstalled'); } catch(e) {}
-            var s = body.querySelector('[data-install-section]');
-            if (s) { s.remove(); appendInstallUI(body); }
-        });
-        resetWrap.appendChild(resetLink);
-        sec.appendChild(resetWrap);
     } else if (window._pwaInstallable) {
         hint.textContent = 'Install this app on your device for an icon on your home screen, faster startup, and full offline reading.';
         sec.appendChild(hint);
@@ -6378,7 +6375,7 @@ function appendYtChannelUI(body) {
             vEl = document.createElement('div');
             vEl.className = 'app-version-footer';
         }
-        vEl.textContent = 'Quran Display v11.7';
+        vEl.textContent = 'Quran Display v11.8';
         body.appendChild(vEl);
     }
 

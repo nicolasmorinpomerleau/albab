@@ -1,7 +1,7 @@
 'use strict';
 
 // ═══════════════════════════════════════════════════════════════════
-// QURAN DISPLAY v11.7
+// QURAN DISPLAY v11.8
 // Features: Juz nav · Search history · Bookmarks · Reading history
 //           Verse highlighting · Personal notes · Font size slider
 // ═══════════════════════════════════════════════════════════════════
@@ -1355,7 +1355,7 @@ function setTocTabActive(tab) {
 function applyTocWidth() {
     try {
         const sw = parseInt(localStorage.getItem('quranTocWidth'), 10);
-        if (sw && sw >= 140) scaleTocFont(sw);
+        if (sw && sw >= 320) scaleTocFont(sw);
     } catch(e) {}
 }
 
@@ -2220,7 +2220,7 @@ document.getElementById('quranContainer').addEventListener('scroll', function(){
     let dragging = false, startX = 0, startW = 0;
 
     function applyWidth(w) {
-        const clamped = Math.max(140, Math.min(700, w));
+        const clamped = Math.max(320, Math.min(700, w));
         toc.style.width = clamped + 'px'; toc.style.minWidth = clamped + 'px'; toc.style.flex = 'none';
         scaleTocFont(clamped); return clamped;
     }
@@ -2250,7 +2250,9 @@ document.getElementById('quranContainer').addEventListener('scroll', function(){
     });
     try {
         const sw = parseInt(localStorage.getItem('quranTocWidth'), 10);
-        if (sw && sw >= 140 && sw <= 700) applyWidth(sw);
+        // Saved widths below 320 pre-date the 4-tab minimum — reset them to default.
+        if (sw && sw >= 320 && sw <= 700) applyWidth(sw);
+        else applyWidth(360); // Default: 360px ensures all 4 tabs are always visible
     } catch(e) {}
 }());
 
