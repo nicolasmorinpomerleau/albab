@@ -1,7 +1,7 @@
 'use strict';
 
 // ═══════════════════════════════════════════════════════════════════
-// QURAN DISPLAY v11.8
+// QURAN DISPLAY v11.10
 // Features: Juz nav · Search history · Bookmarks · Reading history
 //           Verse highlighting · Personal notes · Font size slider
 // ═══════════════════════════════════════════════════════════════════
@@ -174,10 +174,10 @@ async function getHijriCalendarForMonth() {
 
 // ─── UI label translations ─────────────────────────────────────────
 const uiTranslations = {
-    arabic:  { toggleOrder:'ترتيب الوحي', context:'سياق السورة', searchbutton:'بحث في القرآن', surahSearch:'بحث في السورة', bookmarks:'📁 المحفوظات', tocSurah:'السور', tocJuz:'الأجزاء', tocRevelation:'الوحي', tocTopics:'المواضيع', langQuranLabel:'لغة القرآن', langAddLabel:'إضافة ترجمات', settingsTitle:'⚙️ الإعدادات', settingsFontSize:'حجم الخط', settingsVerseLabel:'آية', settingsTranslLabel:'ترجمة', settingsAddTransl:'إضافة ترجمة', settingsAddLangPh:'+ أضف لغة…', sectionSearch:'بحث', sectionDisplay:'العرض', sectionLanguages:'اللغات', sectionTools:'الأدوات', sectionSupport:'الدعم', footer:'القرآن الكريم · اقرأ بقلب واعٍ', rtl:true },
-    french:  { toggleOrder:'Ordre de révélation', context:'Contexte de la sourate', searchbutton:'Recherche dans le Coran', surahSearch:'Recherche dans la Sourate', bookmarks:'📁 Enregistrés', tocSurah:'Sourates', tocJuz:'Juz', tocRevelation:'Révélation', tocTopics:'Thèmes', langQuranLabel:'Langue du Coran', langAddLabel:'Ajouter des traductions', settingsTitle:'⚙️ Paramètres', settingsFontSize:'Taille de police', settingsVerseLabel:'Verset', settingsTranslLabel:'Traduction', settingsAddTransl:'Ajouter une traduction', settingsAddLangPh:'+ Ajouter une langue…', sectionSearch:'Recherche', sectionDisplay:'Affichage', sectionLanguages:'Langues', sectionTools:'Outils', sectionSupport:'Assistance', footer:'Lisez avec un cœur attentif', rtl:false },
-    english: { toggleOrder:'Revelation Order', context:'Surah Context', searchbutton:'Quran Search', surahSearch:'Surah Search', bookmarks:'📁 Saved', tocSurah:'Surahs', tocJuz:'Juz', tocRevelation:'Revelation', tocTopics:'Topics', langQuranLabel:'Quran language', langAddLabel:'Add translations', settingsTitle:'⚙️ Settings', settingsFontSize:'Font size', settingsVerseLabel:'Verse', settingsTranslLabel:'Translation', settingsAddTransl:'Add a translation', settingsAddLangPh:'+ Add a language…', sectionSearch:'Search', sectionDisplay:'Display', sectionLanguages:'Languages', sectionTools:'Tools', sectionSupport:'Support', footer:'May you read with a mindful heart', rtl:false },
-    spanish: { toggleOrder:'Orden de revelación', context:'Contexto de la sura', searchbutton:'Búsqueda en el Corán', surahSearch:'Búsqueda en la Sura', bookmarks:'📁 Guardados', tocSurah:'Suras', tocJuz:'Juz', tocRevelation:'Revelación', tocTopics:'Temas', langQuranLabel:'Idioma del Corán', langAddLabel:'Añadir traducciones', settingsTitle:'⚙️ Configuración', settingsFontSize:'Tamaño de fuente', settingsVerseLabel:'Verso', settingsTranslLabel:'Traducción', settingsAddTransl:'Añadir traducción', settingsAddLangPh:'+ Añadir un idioma…', sectionSearch:'Búsqueda', sectionDisplay:'Pantalla', sectionLanguages:'Idiomas', sectionTools:'Herramientas', sectionSupport:'Asistencia', footer:'Que leas con un corazón atento', rtl:false }
+    arabic:  { toggleOrder:'ترتيب الوحي', context:'سياق السورة', searchbutton:'بحث في القرآن', surahSearch:'بحث في السورة', bookmarks:'📁 المحفوظات', tocSurah:'السور', tocJuz:'الأجزاء', tocRevelation:'الوحي', tocTopics:'المواضيع', langQuranLabel:'لغة القرآن', langAddLabel:'إضافة ترجمات', settingsTitle:'⚙️ الإعدادات', settingsFontSize:'حجم الخط', settingsVerseLabel:'آية', settingsTranslLabel:'ترجمة', settingsAddTransl:'إضافة ترجمة', settingsAddLangPh:'+ أضف لغة…', sectionSearch:'بحث', sectionDisplay:'العرض', sectionLanguages:'اللغات', sectionTools:'الأدوات', sectionSupport:'الدعم', footer:'القرآن الكريم · اقرأ بقلب واعٍ', settingsScale:'مقياس', zoomPinchMsg:'لضبط الحجم: الإعدادات ‹ العرض', rtl:true },
+    french:  { toggleOrder:'Ordre de révélation', context:'Contexte de la sourate', searchbutton:'Recherche dans le Coran', surahSearch:'Recherche dans la Sourate', bookmarks:'📁 Enregistrés', tocSurah:'Sourates', tocJuz:'Juz', tocRevelation:'Révélation', tocTopics:'Thèmes', langQuranLabel:'Langue du Coran', langAddLabel:'Ajouter des traductions', settingsTitle:'⚙️ Paramètres', settingsFontSize:'Taille de police', settingsVerseLabel:'Verset', settingsTranslLabel:'Traduction', settingsAddTransl:'Ajouter une traduction', settingsAddLangPh:'+ Ajouter une langue…', sectionSearch:'Recherche', sectionDisplay:'Affichage', sectionLanguages:'Langues', sectionTools:'Outils', sectionSupport:'Assistance', footer:'Lisez avec un cœur attentif', settingsScale:'Échelle', zoomPinchMsg:'Pour zoomer : Paramètres › Affichage', rtl:false },
+    english: { toggleOrder:'Revelation Order', context:'Surah Context', searchbutton:'Quran Search', surahSearch:'Surah Search', bookmarks:'📁 Saved', tocSurah:'Surahs', tocJuz:'Juz', tocRevelation:'Revelation', tocTopics:'Topics', langQuranLabel:'Quran language', langAddLabel:'Add translations', settingsTitle:'⚙️ Settings', settingsFontSize:'Font size', settingsVerseLabel:'Verse', settingsTranslLabel:'Translation', settingsAddTransl:'Add a translation', settingsAddLangPh:'+ Add a language…', sectionSearch:'Search', sectionDisplay:'Display', sectionLanguages:'Languages', sectionTools:'Tools', sectionSupport:'Support', footer:'May you read with a mindful heart', settingsScale:'Scale', zoomPinchMsg:'To resize: Settings › Display', rtl:false },
+    spanish: { toggleOrder:'Orden de revelación', context:'Contexto de la sura', searchbutton:'Búsqueda en el Corán', surahSearch:'Búsqueda en la Sura', bookmarks:'📁 Guardados', tocSurah:'Suras', tocJuz:'Juz', tocRevelation:'Revelación', tocTopics:'Temas', langQuranLabel:'Idioma del Corán', langAddLabel:'Añadir traducciones', settingsTitle:'⚙️ Configuración', settingsFontSize:'Tamaño de fuente', settingsVerseLabel:'Verso', settingsTranslLabel:'Traducción', settingsAddTransl:'Añadir traducción', settingsAddLangPh:'+ Añadir un idioma…', sectionSearch:'Búsqueda', sectionDisplay:'Pantalla', sectionLanguages:'Idiomas', sectionTools:'Herramientas', sectionSupport:'Asistencia', footer:'Que leas con un corazón atento', settingsScale:'Escala', zoomPinchMsg:'Para ampliar: Configuración › Pantalla', rtl:false }
 };
 
 function applyUILanguage(language) {
@@ -332,90 +332,17 @@ document.getElementById('transFontSlider').addEventListener('change', function()
 });
 
 // ═══════════════════════════════════════════════════════════════════
-// PINCH-TO-ZOOM — content only (header + footer are never affected)
-// Native browser zoom is disabled in <meta viewport> (user-scalable=no).
-// This handler intercepts 2-finger pinches on #quranContainer and
-// adjusts font sizes via the existing applyFontSizes() system so the
-// layout reflows naturally and scroll always works correctly.
-// Double-tap anywhere in the content area resets to default sizes.
+// PINCH INTERCEPT — block native browser zoom (no scale, no toast)
+// Chrome Android ignores user-scalable=no since v56; we block at the
+// document level so a 2-finger gesture never shifts the reading position.
 // ═══════════════════════════════════════════════════════════════════
 (function initPinchZoom() {
-    var container = document.getElementById('quranContainer');
-    if (!container) return;
-
-    var _pinchActive    = false;
-    var _pinchStartDist = 0;
-    var _pinchStartAr   = 0;
-    var _pinchStartTr   = 0;
-    var _lastTap        = 0;
-    var _indicator      = null;
-    var _hideTimer      = null;
-    var _defaultAr      = _isPhone ? 1.6 : 2.8;
-    var _defaultTr      = _isPhone ? 1.0 : 1.87;
-
-    function _pinchDist(touches) {
-        var dx = touches[0].clientX - touches[1].clientX;
-        var dy = touches[0].clientY - touches[1].clientY;
-        return Math.sqrt(dx * dx + dy * dy);
-    }
-
-    function _showIndicator(pct) {
-        if (!_indicator) {
-            _indicator = document.createElement('div');
-            _indicator.className = 'pinch-zoom-indicator';
-            document.body.appendChild(_indicator);
-        }
-        _indicator.textContent = Math.round(pct) + '%';
-        _indicator.classList.add('show');
-        clearTimeout(_hideTimer);
-        _hideTimer = setTimeout(function() {
-            if (_indicator) _indicator.classList.remove('show');
-        }, 1000);
-    }
-
-    container.addEventListener('touchstart', function(e) {
-        if (e.touches.length === 2) {
-            _pinchActive    = true;
-            _pinchStartDist = _pinchDist(e.touches);
-            _pinchStartAr   = fontSizes.arabic;
-            _pinchStartTr   = fontSizes.trans;
-            e.preventDefault();
-            return;
-        }
-        // Double-tap to reset font size
-        if (e.touches.length === 1) {
-            var now = Date.now();
-            if (now - _lastTap < 280) {
-                fontSizes.arabic = _defaultAr;
-                fontSizes.trans  = _defaultTr;
-                lsSet(FONT_KEY, fontSizes);
-                applyFontSizes();
-                _showIndicator(100);
-                e.preventDefault();
-            }
-            _lastTap = now;
-        }
+    document.addEventListener('touchstart', function(e) {
+        if (e.touches.length >= 2) e.preventDefault();
     }, { passive: false });
-
-    container.addEventListener('touchmove', function(e) {
-        if (!_pinchActive || e.touches.length !== 2) return;
-        e.preventDefault();
-        var ratio     = _pinchDist(e.touches) / _pinchStartDist;
-        var newAr     = Math.min(5,   Math.max(1.2, _pinchStartAr * ratio));
-        var newTr     = Math.min(3,   Math.max(0.7, _pinchStartTr * ratio));
-        fontSizes.arabic = Math.round(newAr * 10) / 10;
-        fontSizes.trans  = Math.round(newTr * 20) / 20;
-        applyFontSizes();
-        _showIndicator((fontSizes.arabic / _defaultAr) * 100);
+    document.addEventListener('touchmove', function(e) {
+        if (e.touches.length >= 2) e.preventDefault();
     }, { passive: false });
-
-    container.addEventListener('touchend', function(e) {
-        if (!_pinchActive) return;
-        if (e.touches.length < 2) {
-            _pinchActive = false;
-            lsSet(FONT_KEY, fontSizes);
-        }
-    }, { passive: true });
 }());
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1725,8 +1652,6 @@ function reapplyVerseActions(suraId) {
     });
 }
 
-// v10.8: Robust lookup for the currently displayed .sura element.
-// Handles the zoom-wrapper case where firstChild is the wrapper, not the sura.
 function getCurrentSuraEl() {
     var container = document.getElementById('quranContainer');
     if (!container) return null;
@@ -3546,6 +3471,7 @@ function buildSheetSettings(body, title) {
         row.appendChild(lbl); row.appendChild(inp); row.appendChild(val);
         fontSection.appendChild(row);
     });
+
     // v10.11: fontSection appended AFTER translation section (see below)
 
     // Add translation language section
@@ -4210,168 +4136,3 @@ displaySearchResultsForSourat = function(verses, sura, word) {
 };
 
 // v9.5: Mobile search input sync removed — fixed bar no longer exists
-
-
-// ═══════════════════════════════════════════════════════════════════
-// v9.8 — Pinch-to-zoom only the reading content
-//        Header and bottom nav stay anchored (no whole-page zoom)
-// ═══════════════════════════════════════════════════════════════════
-(function() {
-    var ZOOM_KEY = 'quranReadingZoom';
-    var MIN_ZOOM = 0.7;
-    var MAX_ZOOM = 3.0;
-
-    // Restore saved zoom
-    var savedZoom = parseFloat(localStorage.getItem(ZOOM_KEY)) || 1;
-    if (savedZoom < MIN_ZOOM || savedZoom > MAX_ZOOM) savedZoom = 1;
-    document.documentElement.style.setProperty('--reading-zoom', savedZoom);
-
-    // Indicator element
-    var indicator = null;
-    function getIndicator() {
-        if (!indicator) {
-            indicator = document.createElement('div');
-            indicator.className = 'zoom-indicator';
-            document.body.appendChild(indicator);
-        }
-        return indicator;
-    }
-
-    function showIndicator(zoom) {
-        var el = getIndicator();
-        el.textContent = Math.round(zoom * 100) + '%';
-        el.classList.add('show');
-        clearTimeout(window._zoomIndicatorTimer);
-        window._zoomIndicatorTimer = setTimeout(function() {
-            el.classList.remove('show');
-        }, 600);
-    }
-
-    function setZoom(z) {
-        z = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, z));
-        document.documentElement.style.setProperty('--reading-zoom', z);
-        try { localStorage.setItem(ZOOM_KEY, z); } catch(e) {}
-        return z;
-    }
-
-    // Wrap reading content in a zoom wrapper after every render
-    // v9.12: Re-applies zoom as a defensive measure after every wrap
-    function wrapReadingContent() {
-        var container = document.getElementById('quranContainer');
-        var ctxContainer = document.getElementById('suraContent');
-        [container, ctxContainer].forEach(function(target) {
-            if (!target) return;
-            // Only wrap once: if first child is already the wrapper, skip
-            if (target.firstElementChild && target.firstElementChild.classList && target.firstElementChild.classList.contains('zoom-wrapper')) return;
-            // Don't wrap empty containers
-            if (target.children.length === 0) return;
-            // Don't wrap eraseDiv
-            if (target.classList.contains('eraseDiv')) return;
-            var wrapper = document.createElement('div');
-            wrapper.className = 'zoom-wrapper';
-            // Move all children into wrapper
-            while (target.firstChild) wrapper.appendChild(target.firstChild);
-            target.appendChild(wrapper);
-        });
-        // v9.12: Defensively re-assert the saved zoom value on the root
-        // in case anything cleared it
-        var savedZ = parseFloat(localStorage.getItem(ZOOM_KEY)) || 1;
-        if (savedZ !== 1) {
-            document.documentElement.style.setProperty('--reading-zoom', savedZ);
-        }
-    }
-
-    // Re-wrap when content changes (after displaySingleSura, displaySuraContext, etc.)
-    var origDisplaySingleSura = displaySingleSura;
-    displaySingleSura = function(suraId) {
-        origDisplaySingleSura(suraId);
-        setTimeout(wrapReadingContent, 10);
-    };
-
-    var origDisplaySingleRevelationSura = displaySingleRevelationSura;
-    displaySingleRevelationSura = function(suraNum) {
-        origDisplaySingleRevelationSura(suraNum);
-        setTimeout(wrapReadingContent, 10);
-    };
-
-    var origDisplaySuraContext = displaySuraContext;
-    displaySuraContext = function(sura, suraIndex) {
-        origDisplaySuraContext(sura, suraIndex);
-        setTimeout(wrapReadingContent, 10);
-    };
-
-    // Pinch gesture handler
-    var pinchActive = false;
-    var pinchStartDist = 0;
-    var pinchStartZoom = 1;
-
-    function getDist(touches) {
-        var dx = touches[0].clientX - touches[1].clientX;
-        var dy = touches[0].clientY - touches[1].clientY;
-        return Math.sqrt(dx*dx + dy*dy);
-    }
-
-    function isInsideReading(target) {
-        // Only handle pinch if touches are inside the reading area
-        return target && (target.closest('#quranContainer') || target.closest('#suraContent'));
-    }
-
-    document.addEventListener('touchstart', function(e) {
-        if (e.touches.length === 2 && isInsideReading(e.target)) {
-            pinchActive = true;
-            pinchStartDist = getDist(e.touches);
-            pinchStartZoom = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--reading-zoom')) || 1;
-            e.preventDefault();
-        }
-    }, { passive: false });
-
-    document.addEventListener('touchmove', function(e) {
-        if (pinchActive && e.touches.length === 2) {
-            var newDist = getDist(e.touches);
-            var ratio = newDist / pinchStartDist;
-            var newZoom = setZoom(pinchStartZoom * ratio);
-            showIndicator(newZoom);
-            e.preventDefault();
-        }
-    }, { passive: false });
-
-    var lastTap = 0;
-    document.addEventListener('touchend', function(e) {
-        if (pinchActive && e.touches.length < 2) {
-            pinchActive = false;
-            // v9.12: After a pinch, reset lastTap so the next single-tap
-            // doesn't trigger an accidental double-tap zoom reset
-            lastTap = 0;
-        }
-    });
-
-    document.addEventListener('touchcancel', function() {
-        pinchActive = false;
-        lastTap = 0;
-    });
-
-    // Double-tap to reset zoom
-    document.addEventListener('touchend', function(e) {
-        if (!isInsideReading(e.target)) return;
-        if (e.changedTouches.length !== 1) return;
-        // v9.12: Don't count taps during/right after a multi-touch
-        if (pinchActive) return;
-        if (e.touches.length > 0) return; // still touching with another finger
-        var now = Date.now();
-        if (lastTap > 0 && now - lastTap < 300) {
-            // Double-tap — reset zoom to 1
-            var current = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--reading-zoom')) || 1;
-            if (current !== 1) {
-                setZoom(1);
-                showIndicator(1);
-                e.preventDefault();
-            }
-            lastTap = 0; // consume
-        } else {
-            lastTap = now;
-        }
-    });
-
-    // Initial wrap on page load
-    setTimeout(wrapReadingContent, 200);
-}());
