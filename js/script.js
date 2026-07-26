@@ -1,7 +1,7 @@
 'use strict';
 
 // ═══════════════════════════════════════════════════════════════════
-// QURAN DISPLAY v11.10
+// QURAN DISPLAY v11.12
 // Features: Juz nav · Search history · Bookmarks · Reading history
 //           Verse highlighting · Personal notes · Font size slider
 // ═══════════════════════════════════════════════════════════════════
@@ -1576,22 +1576,6 @@ function buildSuraDOM(sura) {
         if (typeof printCurrentSurah === 'function') printCurrentSurah();
     });
     sticky.appendChild(printPill);
-
-    // Focus pill (right) — only if focus mode feature is on
-    const focusPill = document.createElement('button');
-    focusPill.className = 'sura-focus-pill';
-    focusPill.title = 'Enter focus mode';
-    focusPill.textContent = '🧘';
-    focusPill.addEventListener('click', function(e) {
-        e.stopPropagation();
-        if (typeof enterFocusMode === 'function') {
-            enterFocusMode();
-        }
-    });
-    if (typeof isFeatureOn === 'function' && !isFeatureOn('focusMode')) {
-        focusPill.classList.add('hidden');
-    }
-    sticky.appendChild(focusPill);
 
     wrapper.appendChild(sticky);
 

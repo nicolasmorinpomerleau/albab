@@ -254,7 +254,6 @@ const DEFAULT_FEATURES = {
     searchAsYouType:   true,         // #5
     saveTools:         true,         // v10.8 — unified: highlight + bookmark + note
     arabicFontChoice:  true,         // #17
-    focusMode:         true,         // #18
     autoDarkTheme:     false,        // #19 (off by default — opinionated)
     browserLangDefault:false,        // #20 (off by default — Arabic is best default)
     hapticFeedback:    true,         // #22 (mobile)
@@ -636,12 +635,6 @@ function showLastReadBanner() {
             return;
         }
 
-        // F to toggle focus mode
-        if (e.key === 'f' || e.key === 'F') {
-            toggleFocusMode();
-            e.preventDefault();
-            return;
-        }
     });
 }());
 
@@ -656,7 +649,6 @@ function toggleShortcutsHelp() {
             '<div class="shortcuts-header"><h3>Keyboard shortcuts</h3><button class="shortcuts-close">✕</button></div>' +
             '<div class="shortcut-row"><kbd>←</kbd> <kbd>→</kbd><span>Previous / Next surah</span></div>' +
             '<div class="shortcut-row"><kbd>/</kbd><span>Focus search</span></div>' +
-            '<div class="shortcut-row"><kbd>F</kbd><span>Toggle focus mode</span></div>' +
             '<div class="shortcut-row"><kbd>Esc</kbd><span>Close panel / modal</span></div>' +
             '<div class="shortcut-row"><kbd>?</kbd><span>Show this help</span></div>' +
             '</div>';
@@ -669,35 +661,6 @@ function toggleShortcutsHelp() {
     }
     help.classList.toggle('show');
 }
-
-// ═══════════════════════════════════════════════════════════════════
-// #18 — Focus / reading mode
-// ═══════════════════════════════════════════════════════════════════
-function toggleFocusMode() {
-    if (!isFeatureOn('focusMode')) return;
-    var entering = !document.body.classList.contains('focus-mode');
-    if (entering) {
-        document.body.classList.add('focus-mode');
-        window._focusModeActivatedAt = Date.now();
-    } else {
-        document.body.classList.remove('focus-mode');
-    }
-    track('focus_mode_toggled', { state: entering ? 'on' : 'off' });
-    hapticTap(15);
-}
-
-// v9.11: Tap anywhere in focus mode to exit — but ignore taps that happen
-// within 500ms of activation (so the same tap that activated it doesn't exit)
-document.addEventListener('click', function(e) {
-    if (!document.body.classList.contains('focus-mode')) return;
-    var activated = window._focusModeActivatedAt || 0;
-    if (Date.now() - activated < 500) return;
-    // Don't exit if user clicked a button inside the verse area
-    if (e.target.closest('.verse-action-btn')) return;
-    if (e.target.closest('.verse-actions')) return;
-    if (e.target.closest('.verse-chooser')) return;
-    document.body.classList.remove('focus-mode');
-});
 
 // ═══════════════════════════════════════════════════════════════════
 // #5 — Search-as-you-type (debounced) — works for ANY search input
@@ -1162,7 +1125,7 @@ function buildVerseNav() {
 // ═══════════════════════════════════════════════════════════════════
 function exportAllData() {
     var data = {
-        version:      (function() { var el = document.getElementById('sidebarVersionEl'); if (el && el.textContent) return el.textContent.trim(); el = document.querySelector('.app-version-footer'); return (el && el.textContent) ? el.textContent.replace('Quran Display ', '').trim() : 'v11.10'; }()),
+        version:      (function() { var el = document.getElementById('sidebarVersionEl'); if (el && el.textContent) return el.textContent.trim(); el = document.querySelector('.app-version-footer'); return (el && el.textContent) ? el.textContent.replace('Quran Display ', '').trim() : 'v11.12'; }()),
         exportedAt:   new Date().toISOString(),
         bookmarks:    JSON.parse(localStorage.getItem('quranBookmarks') || '[]'),
         notes:        JSON.parse(localStorage.getItem('quranNotes') || '{}'),
@@ -1458,19 +1421,6 @@ function toggleInlineHeatmap(suraWrapper) {
     }, 100);
 }
 
-// ── v10: Programmatic focus mode entry (replaces old toggle in some paths) ──
-function enterFocusMode() {
-    if (!isFeatureOn('focusMode')) {
-        // Auto-enable for the user since they obviously want it
-        var current = getFeatures();
-        current.focusMode = true;
-        saveFeatures(current);
-    }
-    document.body.classList.add('focus-mode');
-    window._focusModeActivatedAt = Date.now();
-    hapticTap(15);
-}
-
 // ═══════════════════════════════════════════════════════════════════
 // #17 — Arabic font choice
 // ═══════════════════════════════════════════════════════════════════
@@ -1510,7 +1460,6 @@ function loadArabicFontChoice() {
     window.buildSheetSettings = buildSheetSettings = function(body, title) {
         orig(body, title);
         appendFeaturesUI(body);
-        appendFocusModeButton(body);
         appendKhatmUI(body);
         // v10.10: appendDataUI moved to a final injection layer (always last)
     };
@@ -1568,23 +1517,6 @@ function appendFeaturesUI(body) {
                     var kSec = body.querySelector('[data-khatm-section]');
                     if (kSec) kSec.remove();
                 }
-            }
-            if (key === 'voiceSearch') {
-                if (this.checked && typeof attachVoiceSearchButton === 'function') {
-                    ['search-input', 'mob-search-input'].forEach(function(id) {
-                        var el = document.getElementById(id);
-                        if (el) { delete el._voiceAttached; attachVoiceSearchButton(el); }
-                    });
-                } else {
-                    document.querySelectorAll('.voice-search-btn').forEach(function(b){ b.remove(); });
-                    ['search-input', 'mob-search-input'].forEach(function(id) {
-                        var el = document.getElementById(id);
-                        if (el) delete el._voiceAttached;
-                    });
-                }
-            }
-            if (key === 'verseComparison' && !this.checked) {
-                if (typeof closeTafsirCompare === 'function') closeTafsirCompare();
             }
             track('feature_toggled', { feature: key, state: this.checked ? 'on' : 'off' });
             showToast(this.checked ? '✓ Enabled' : '✗ Disabled');
@@ -1707,7 +1639,6 @@ function appendFeaturesUI(body) {
     readSec.appendChild(makeToggleRow('lastReadBanner',  '📍 "Continue reading" banner', 'Shows previously-read surah at top so you can jump back'));
     readSec.appendChild(makeToggleRow('verseNavigation', '⇆ Verse navigation buttons',   'Floating prev / next / jump-to-verse buttons'));
     readSec.appendChild(makeToggleRow('dailyVerse',      '🌅 Daily verse',                'A contemplative verse shown once per day on open'));
-    readSec.appendChild(makeToggleRow('focusMode',       '🧘 Focus mode',                 'Hides everything except verses (key: F)'));
     body.appendChild(readSec);
 
     // 🔍 Search
@@ -1716,13 +1647,11 @@ function appendFeaturesUI(body) {
         // Search-as-you-type is a desktop-only setting — on mobile the keyboard dismisses between taps
         searchSec.appendChild(makeToggleRow('searchAsYouType', '⚡ Search as you type', 'Auto-runs search 350ms after you stop typing'));
     }
-    searchSec.appendChild(makeToggleRow('voiceSearch',     '🎤 Voice search',       'Tap the mic to speak a search query'));
     body.appendChild(searchSec);
 
     // 📚 Study
     var studySec = makeSection('📚 Study', 'study');
     studySec.appendChild(makeToggleRow('tafsir',            '📚 Tafsir (commentary)',  'Tap a verse to read classical commentary · needs internet'));
-    studySec.appendChild(makeToggleRow('verseComparison',   '🔀 Compare tafsirs',      'Adds "Compare all" button in the tafsir modal'));
     studySec.appendChild(makeToggleRow('reflectionPrompts', '✍️ Reflection prompts',   'Optional reflection question after finishing a surah'));
     studySec.appendChild(makeToggleRow('khatmTracker',      '🎯 Khatm tracker',        'Daily reading heatmap + completion count'));
     body.appendChild(studySec);
@@ -1901,39 +1830,6 @@ function appendDataUI(body) {
     outerSec.appendChild(header);
     outerSec.appendChild(content);
     body.appendChild(outerSec);
-}
-
-function appendFocusModeButton(body) {
-    if (!isFeatureOn('focusMode')) return;
-    var sec = document.createElement('div');
-    sec.className = 'mob-settings-section';
-    var lbl = document.createElement('div');
-    lbl.className = 'mob-settings-lbl';
-    lbl.textContent = 'Reading mode';
-    sec.appendChild(lbl);
-
-    var hint = document.createElement('div');
-    hint.style.cssText = 'font-size:12px;color:var(--text-secondary);margin-bottom:8px;opacity:0.85;line-height:1.4;';
-    hint.textContent = 'Hides everything except the verses. Tap the screen to bring back controls.';
-    sec.appendChild(hint);
-
-    var btn = document.createElement('button');
-    btn.className = 'mob-settings-btn';
-    btn.textContent = '🧘 Enter focus mode';
-    btn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        if (typeof closeMobileSheet === 'function') closeMobileSheet();
-        // v9.11: Delay activation so this same click doesn't trigger the
-        // tap-to-exit listener bubbling up to document
-        setTimeout(function() {
-            document.body.classList.add('focus-mode');
-            window._focusModeActivatedAt = Date.now();
-            hapticTap(15);
-        }, 350);
-    });
-    sec.appendChild(btn);
-
-    body.appendChild(sec);
 }
 
 function appendKhatmUI(body) {
@@ -2130,7 +2026,6 @@ window.openFeaturesModal = function() {
     body.appendChild(med);
     // Reuse the same UI builders the mobile sheet uses
     if (typeof appendFeaturesUI      === 'function') appendFeaturesUI(body);
-    if (typeof appendFocusModeButton === 'function') appendFocusModeButton(body);
     if (typeof appendKhatmUI         === 'function') appendKhatmUI(body);
     // Version footer and section reordering handled by finalSettingsCleanup (last injection)
     overlay.classList.add('show');
@@ -5122,16 +5017,6 @@ function appendV107SettingsUI(body) {
             if (existing) existing.remove();
             if (e.target.checked) setTimeout(appendHijriBadge, 100);
         }
-        if (key === 'voiceSearch' && e.target.checked) {
-            ['search-input', 'mob-search-input'].forEach(function(id) {
-                var el = document.getElementById(id);
-                if (el) attachVoiceSearchButton(el);
-            });
-        }
-        if (key === 'voiceSearch' && !e.target.checked) {
-            document.querySelectorAll('.voice-search-btn').forEach(function(b){ b.remove(); });
-            document.querySelectorAll('input[id*="search"]').forEach(function(i){ delete i._voiceAttached; });
-        }
         if (key === 'topicsIndex' && !e.target.checked) {
             closeTopicsModal();
         }
@@ -5149,9 +5034,7 @@ function applyFeatureBodyClasses() {
         ['saveTools',         'feature-off-savetools'],
         ['copyShareVerse',    'feature-off-share'],
         ['tafsir',            'feature-off-tafsir'],
-        ['focusMode',         'feature-off-focusmode'],
         ['audioRecitation',   'feature-off-audio'],
-        ['voiceSearch',       'feature-off-voice'],
         ['topicsIndex',       'feature-off-topics'],
         ['pdfExport',         'feature-off-print'],
         ['readingTimeAnalytics','feature-off-readingtime'],
@@ -5848,7 +5731,7 @@ var HELP_STRINGS = {
             {
                 icon: '⌨️',
                 title: 'Keyboard Shortcuts',
-                desc: 'On desktop: ← → to move between Surahs, F for Focus mode, ? to show shortcuts, Escape to close any panel.',
+                desc: 'On desktop: ← → to move between Surahs, ? to show shortcuts, Escape to close any panel.',
                 mock: 'kbd'
             }
         ]
@@ -5921,7 +5804,7 @@ var HELP_STRINGS = {
             {
                 icon: '⌨️',
                 title: 'Raccourcis clavier',
-                desc: 'Sur ordinateur : ← → pour changer de Sourate, F pour le mode Focus, ? pour voir les raccourcis, Échap pour fermer tout panneau.',
+                desc: 'Sur ordinateur : ← → pour changer de Sourate, ? pour voir les raccourcis, Échap pour fermer tout panneau.',
                 mock: 'kbd'
             }
         ]
@@ -5994,7 +5877,7 @@ var HELP_STRINGS = {
             {
                 icon: '⌨️',
                 title: 'اختصارات لوحة المفاتيح',
-                desc: 'على الحاسوب: ← → للتنقل بين السور، F لوضع التركيز، ? لعرض الاختصارات، Escape لإغلاق أي لوحة.',
+                desc: 'على الحاسوب: ← → للتنقل بين السور، ? لعرض الاختصارات، Escape لإغلاق أي لوحة.',
                 mock: 'kbd'
             }
         ]
@@ -6067,7 +5950,7 @@ var HELP_STRINGS = {
             {
                 icon: '⌨️',
                 title: 'Atajos de teclado',
-                desc: 'En escritorio: ← → para cambiar de Sura, F para Modo Enfoque, ? para ver atajos, Escape para cerrar cualquier panel.',
+                desc: 'En escritorio: ← → para cambiar de Sura, ? para ver atajos, Escape para cerrar cualquier panel.',
                 mock: 'kbd'
             }
         ]
@@ -6384,7 +6267,7 @@ function appendYtChannelUI(body) {
             vEl = document.createElement('div');
             vEl.className = 'app-version-footer';
         }
-        vEl.textContent = 'Quran Display v11.10';
+        vEl.textContent = 'Quran Display v11.12';
         body.appendChild(vEl);
     }
 

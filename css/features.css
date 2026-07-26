@@ -459,46 +459,6 @@
     opacity: 0.85;
 }
 
-/* ── Focus mode ── */
-body.focus-mode header,
-body.focus-mode .sidebar1,
-body.focus-mode .bottom-nav,
-body.focus-mode footer,
-body.focus-mode #verseNavFab,
-body.focus-mode #lastReadBanner,
-body.focus-mode #tocContainer {
-    display: none !important;
-}
-body.focus-mode .textContainer,
-body.focus-mode .sura-contexte {
-    padding: 40px 60px !important;
-}
-@media (max-width: 600px) {
-    body.focus-mode .textContainer,
-    body.focus-mode .sura-contexte {
-        padding: 24px 18px !important;
-    }
-}
-/* Subtle exit hint in focus mode */
-body.focus-mode::after {
-    content: 'F or Esc to exit';
-    position: fixed;
-    bottom: 16px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 11px;
-    color: var(--text-muted);
-    font-family: var(--font-ui);
-    opacity: 0.5;
-    pointer-events: none;
-    z-index: 9;
-}
-@media (max-width: 900px) {
-    body.focus-mode::after {
-        content: 'Tap anywhere to exit';
-    }
-}
-
 /* ── Verse navigation FAB ── */
 .verse-nav-fab {
     position: fixed;
@@ -731,8 +691,7 @@ body.focus-mode::after {
         font-size: 13px !important;
     }
     .sura-streak-pill,
-    .sura-print-pill,
-    .sura-focus-pill {
+    .sura-print-pill {
         padding: 2px 7px !important;
         font-size: 11px !important;
     }
@@ -1069,28 +1028,6 @@ body.focus-mode::after {
 .sura-streak-pill:hover { background: var(--accent-faint); }
 .sura-streak-pill.hidden { visibility: hidden; }
 .sura-streak-pill .streak-num { font-weight: 700; }
-
-.sura-focus-pill {
-    background: var(--accent-trace);
-    border: 1px solid var(--accent-faint);
-    color: var(--accent);
-    padding: 3px 9px;
-    border-radius: 99px;
-    font-size: 13px;
-    cursor: pointer;
-    flex-shrink: 0;
-    line-height: 1;
-    transition: background 0.15s, transform 0.1s;
-    width: auto;
-    height: auto;
-    font-family: inherit;
-}
-.sura-focus-pill:hover {
-    background: var(--accent-faint);
-    transform: scale(1.05);
-}
-.sura-focus-pill:active { transform: scale(0.92); }
-.sura-focus-pill.hidden { display: none; }
 
 /* Inline heatmap (slides down under sticky title when streak tapped) */
 .inline-heatmap-box {
@@ -3570,8 +3507,6 @@ body.feature-off-share .verse-action-share { display: none !important; }
 body.feature-off-tafsir .verse-action-tafsir { display: none !important; }
 body.feature-off-audio .verse-audio-btn { display: none !important; }
 body.feature-off-audio .audio-mini-player { display: none !important; }
-body.feature-off-focusmode .sura-focus-pill { display: none !important; }
-body.feature-off-voice .voice-search-btn { display: none !important; }
 body.feature-off-topics .top-access-btn,
 body.feature-off-topics #topTopicsBtn { display: none !important; }
 body.feature-off-print .sura-print-pill { display: none !important; }
